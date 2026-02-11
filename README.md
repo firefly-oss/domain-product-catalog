@@ -1,6 +1,6 @@
 # Product Domain Product Catalog
 
-A reactive domain-layer microservice that orchestrates the full product catalog lifecycle -- from registration through publication, suspension, and retirement. Built on [FireflyFramework](https://github.com/fireflyframework/) and Spring WebFlux, this service uses CQRS and Saga orchestration to coordinate up to 19 registration steps in a single atomic workflow with automatic compensation on failure, delegating persistence to the **common-platform-product-mgmt** platform service.
+A reactive domain-layer microservice that orchestrates the full product catalog lifecycle -- from registration through publication, suspension, and retirement. Built on [FireflyFramework](https://github.com/fireflyframework/) and Spring WebFlux, this service uses CQRS and Saga orchestration to coordinate up to 19 registration steps in a single atomic workflow with automatic compensation on failure, delegating persistence to the **core-common-product-mgmt** platform service.
 
 > **Repository:** [https://github.com/firefly-oss/domain-product-catalog](https://github.com/firefly-oss/domain-product-catalog)
 
@@ -105,7 +105,7 @@ All events are published to the `domain-layer` Kafka topic:
 - **Java 25** (JDK)
 - **Apache Maven 3.9+**
 - **Apache Kafka** (default: `localhost:9092`)
-- **common-platform-product-mgmt** service running (default: `http://localhost:8082`)
+- **core-common-product-mgmt** service running (default: `http://localhost:8082`)
 
 ### Environment Variables
 

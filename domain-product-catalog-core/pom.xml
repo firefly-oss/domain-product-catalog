@@ -27,7 +27,7 @@
         <!-- SDKs -->
         <dependency>
             <groupId>com.firefly</groupId>
-            <artifactId>common-platform-product-mgmt-sdk</artifactId>
+            <artifactId>core-common-product-mgmt-sdk</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
