@@ -1,6 +1,6 @@
 spring:
   application:
-    name: product-domain-product-catalog
+    name: domain-product-catalog
     version: 1.0.0
     description: Product Domain Product Catalog Layer Application
     team:

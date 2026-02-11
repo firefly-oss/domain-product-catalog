@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.firefly</groupId>
-        <artifactId>product-domain-product-catalog</artifactId>
+        <artifactId>domain-product-catalog</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>product-domain-product-catalog-sdk</artifactId>
+    <artifactId>domain-product-catalog-sdk</artifactId>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -29,7 +29,7 @@
         <!-- Web module for OpenAPI spec -->
         <dependency>
             <groupId>com.firefly</groupId>
-            <artifactId>product-domain-product-catalog-web</artifactId>
+            <artifactId>domain-product-catalog-web</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -101,7 +101,7 @@
                 <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
-                        <id>product-domain-product-catalog-sdk</id>
+                        <id>domain-product-catalog-sdk</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>

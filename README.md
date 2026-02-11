@@ -2,7 +2,7 @@
 
 A reactive domain-layer microservice that orchestrates the full product catalog lifecycle -- from registration through publication, suspension, and retirement. Built on [FireflyFramework](https://github.com/fireflyframework/) and Spring WebFlux, this service uses CQRS and Saga orchestration to coordinate up to 19 registration steps in a single atomic workflow with automatic compensation on failure, delegating persistence to the **common-platform-product-mgmt** platform service.
 
-> **Repository:** [https://github.com/firefly-oss/product-domain-product-catalog](https://github.com/firefly-oss/product-domain-product-catalog)
+> **Repository:** [https://github.com/firefly-oss/domain-product-catalog](https://github.com/firefly-oss/domain-product-catalog)
 
 ---
 
@@ -24,12 +24,12 @@ Product Domain Product Catalog is the domain orchestration layer responsible for
 ### Module Structure
 
 ```
-product-domain-product-catalog (parent POM)
-|-- product-domain-product-catalog-core         # Domain logic: commands, handlers, queries, services, sagas, constants
-|-- product-domain-product-catalog-interfaces   # Interface/contract layer between core and web
-|-- product-domain-product-catalog-infra        # Infrastructure: API client factory, configuration properties
-|-- product-domain-product-catalog-web          # Spring Boot application, REST controllers, OpenAPI config
-|-- product-domain-product-catalog-sdk          # Auto-generated reactive client SDK (OpenAPI Generator)
+domain-product-catalog (parent POM)
+|-- domain-product-catalog-core         # Domain logic: commands, handlers, queries, services, sagas, constants
+|-- domain-product-catalog-interfaces   # Interface/contract layer between core and web
+|-- domain-product-catalog-infra        # Infrastructure: API client factory, configuration properties
+|-- domain-product-catalog-web          # Spring Boot application, REST controllers, OpenAPI config
+|-- domain-product-catalog-sdk          # Auto-generated reactive client SDK (OpenAPI Generator)
 ```
 
 ### Tech Stack
@@ -147,13 +147,13 @@ All events are published to the `domain-layer` Kafka topic:
 
 ```bash
 # Run with default profile
-./mvnw -pl product-domain-product-catalog-web spring-boot:run
+./mvnw -pl domain-product-catalog-web spring-boot:run
 
 # Run with dev profile
-./mvnw -pl product-domain-product-catalog-web spring-boot:run -Dspring-boot.run.profiles=dev
+./mvnw -pl domain-product-catalog-web spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Run as JAR
-java -jar product-domain-product-catalog-web/target/product-domain-product-catalog.jar
+java -jar domain-product-catalog-web/target/domain-product-catalog.jar
 ```
 
 ---
