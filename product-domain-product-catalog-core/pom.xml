@@ -12,8 +12,8 @@
     <artifactId>product-domain-product-catalog-core</artifactId>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -33,15 +33,13 @@
 
         <!-- Common Libraries -->
         <dependency>
-            <groupId>com.firefly</groupId>
-            <artifactId>lib-utils</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.fireflyframework</groupId>
+            <artifactId>fireflyframework-utils</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.firefly</groupId>
-            <artifactId>lib-common-domain</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.fireflyframework</groupId>
+            <artifactId>fireflyframework-domain</artifactId>
         </dependency>
 
         <!-- Spring WebFlux -->
