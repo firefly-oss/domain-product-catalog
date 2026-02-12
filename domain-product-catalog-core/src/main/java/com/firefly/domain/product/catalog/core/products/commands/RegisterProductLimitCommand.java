@@ -17,7 +17,7 @@
 package com.firefly.domain.product.catalog.core.products.commands;
 
 import com.firefly.common.cqrs.command.Command;
-import com.firefly.common.product.sdk.model.ProductLimitDTO;
+import com.firefly.core.product.sdk.model.ProductLimitDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

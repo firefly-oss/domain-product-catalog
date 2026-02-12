@@ -1,7 +1,7 @@
 package com.firefly.domain.product.catalog.core.products.workflows;
 
 import com.firefly.common.cqrs.query.QueryBus;
-import com.firefly.common.product.sdk.model.ProductDTO;
+import com.firefly.core.product.sdk.model.ProductDTO;
 import com.firefly.domain.product.catalog.core.products.queries.ProductQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

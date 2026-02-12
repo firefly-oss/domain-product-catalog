@@ -2,7 +2,7 @@ package com.firefly.domain.product.catalog.core.products.handlers;
 
 import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
 import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.common.product.sdk.api.ProductCategoryApi;
+import com.firefly.core.product.sdk.api.ProductCategoryApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductCategoryCommand;
 import reactor.core.publisher.Mono;
 

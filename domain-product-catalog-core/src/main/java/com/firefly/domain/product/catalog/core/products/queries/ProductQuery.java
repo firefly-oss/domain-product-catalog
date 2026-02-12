@@ -1,7 +1,7 @@
 package com.firefly.domain.product.catalog.core.products.queries;
 
 import com.firefly.common.cqrs.query.Query;
-import com.firefly.common.product.sdk.model.ProductDTO;
+import com.firefly.core.product.sdk.model.ProductDTO;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

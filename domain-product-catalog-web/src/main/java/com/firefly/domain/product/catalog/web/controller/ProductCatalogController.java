@@ -1,6 +1,6 @@
 package com.firefly.domain.product.catalog.web.controller;
 
-import com.firefly.common.product.sdk.model.ProductDTO;
+import com.firefly.core.product.sdk.model.ProductDTO;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductCommand;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductFeeStructureCommand;
 import com.firefly.domain.product.catalog.core.products.commands.UpdateProductInfoCommand;
