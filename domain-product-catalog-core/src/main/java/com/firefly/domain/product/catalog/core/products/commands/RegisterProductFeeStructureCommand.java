@@ -16,8 +16,8 @@
 
 package com.firefly.domain.product.catalog.core.products.commands;
 
-import com.firefly.common.cqrs.command.Command;
-import com.firefly.core.product.sdk.model.ProductFeeStructureDTO;
+import org.fireflyframework.cqrs.command.Command;
+import com.firefly.core.product.sdk.model.ProductConfigurationDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,8 +25,7 @@ import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class RegisterProductFeeStructureCommand extends ProductFeeStructureDTO implements Command<UUID> {
-    private UUID productId;
+public class RegisterProductFeeStructureCommand extends ProductConfigurationDTO implements Command<UUID> {
     private UUID feeStructureId;
 
     public RegisterProductFeeStructureCommand withProductId(UUID productId) {
@@ -35,7 +34,7 @@ public class RegisterProductFeeStructureCommand extends ProductFeeStructureDTO i
     }
 
     public RegisterProductFeeStructureCommand withFeeStructureId(UUID feeStructureId) {
-        this.setFeeStructureId(feeStructureId);
+        this.feeStructureId = feeStructureId;
         return this;
     }
 }

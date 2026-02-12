@@ -1,8 +1,8 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductSubtypeApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductSubtypeCommand;
 import reactor.core.publisher.Mono;
 
@@ -12,16 +12,16 @@ import java.util.UUID;
 @CommandHandlerComponent
 public class RegisterProductSubtypeHandler extends CommandHandler<RegisterProductSubtypeCommand, UUID> {
 
-    private final ProductSubtypeApi productSubtypeApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RegisterProductSubtypeHandler(ProductSubtypeApi productSubtypeApi) {
-        this.productSubtypeApi = productSubtypeApi;
+    public RegisterProductSubtypeHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductSubtypeCommand cmd) {
-        return productSubtypeApi.createSubtype(cmd.getProductCategoryId(), cmd, UUID.randomUUID().toString())
-                .mapNotNull(productSubtypeDTO ->
-                        Objects.requireNonNull(Objects.requireNonNull(productSubtypeDTO)).getProductSubtypeId());
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productConfigurationDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }
 }

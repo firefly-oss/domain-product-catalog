@@ -1,7 +1,7 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductLocalizationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductLocalizationCommand;
 import reactor.core.publisher.Mono;
@@ -17,6 +17,6 @@ public class RemoveProductLocalizationHandler extends CommandHandler<RemoveProdu
 
     @Override
     protected Mono<Void> doHandle(RemoveProductLocalizationCommand cmd) {
-        return productLocalizationApi.deleteProductLocalization(cmd.productId(), cmd.productLocalizationId()).then();
+        return productLocalizationApi.deleteLocalization(cmd.productId(), cmd.productLocalizationId(), null).then();
     }
 }

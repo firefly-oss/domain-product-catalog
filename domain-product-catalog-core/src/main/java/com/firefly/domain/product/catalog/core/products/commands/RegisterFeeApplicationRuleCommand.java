@@ -16,8 +16,8 @@
 
 package com.firefly.domain.product.catalog.core.products.commands;
 
-import com.firefly.common.cqrs.command.Command;
-import com.firefly.core.product.sdk.model.FeeApplicationRuleDTO;
+import org.fireflyframework.cqrs.command.Command;
+import com.firefly.core.product.sdk.model.ProductConfigurationDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class RegisterFeeApplicationRuleCommand extends FeeApplicationRuleDTO implements Command<UUID> {
+public class RegisterFeeApplicationRuleCommand extends ProductConfigurationDTO implements Command<UUID> {
     private UUID feeComponentId;
 
     public RegisterFeeApplicationRuleCommand withFeeComponentId(UUID feeComponentId) {

@@ -1,11 +1,11 @@
 package com.firefly.domain.product.catalog.core.products.workflows;
 
-import com.firefly.common.cqrs.command.CommandBus;
+import org.fireflyframework.cqrs.command.CommandBus;
 import com.firefly.domain.product.catalog.core.products.commands.*;
-import com.firefly.transactional.saga.annotations.Saga;
-import com.firefly.transactional.saga.annotations.SagaStep;
-import com.firefly.transactional.saga.annotations.StepEvent;
-import com.firefly.transactional.saga.core.SagaContext;
+import org.fireflyframework.transactional.saga.annotations.Saga;
+import org.fireflyframework.transactional.saga.annotations.SagaStep;
+import org.fireflyframework.transactional.saga.annotations.StepEvent;
+import org.fireflyframework.transactional.saga.core.SagaContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

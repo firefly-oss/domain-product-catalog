@@ -1,22 +1,22 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductFeeStructureApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductFeeStructureCommand;
 import reactor.core.publisher.Mono;
 
 @CommandHandlerComponent
 public class RemoveProductFeeStructureHandler extends CommandHandler<RemoveProductFeeStructureCommand, Void> {
 
-    private final ProductFeeStructureApi productFeeStructureApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RemoveProductFeeStructureHandler(ProductFeeStructureApi productFeeStructureApi) {
-        this.productFeeStructureApi = productFeeStructureApi;
+    public RemoveProductFeeStructureHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<Void> doHandle(RemoveProductFeeStructureCommand cmd) {
-        return productFeeStructureApi.deleteProductFeeStructure(cmd.productId(), cmd.productFeeStructureId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productFeeStructureId(), null).then();
     }
 }

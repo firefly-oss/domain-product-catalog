@@ -1,8 +1,8 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductFeeStructureApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductFeeStructureCommand;
 import reactor.core.publisher.Mono;
 
@@ -12,16 +12,16 @@ import java.util.UUID;
 @CommandHandlerComponent
 public class RegisterProductFeeStructureHandler extends CommandHandler<RegisterProductFeeStructureCommand, UUID> {
 
-    private final ProductFeeStructureApi productFeeStructureApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RegisterProductFeeStructureHandler(ProductFeeStructureApi productFeeStructureApi) {
-        this.productFeeStructureApi = productFeeStructureApi;
+    public RegisterProductFeeStructureHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductFeeStructureCommand cmd) {
-        return productFeeStructureApi.createFeeStructure(cmd.getProductId(), cmd, UUID.randomUUID().toString())
-                .mapNotNull(productFeeStructureDTO ->
-                        Objects.requireNonNull(Objects.requireNonNull(productFeeStructureDTO)).getProductFeeStructureId());
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productConfigurationDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }
 }

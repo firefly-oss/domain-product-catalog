@@ -1,22 +1,22 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductBundleApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductBundleCommand;
 import reactor.core.publisher.Mono;
 
 @CommandHandlerComponent
 public class RemoveProductBundleHandler extends CommandHandler<RemoveProductBundleCommand, Void> {
 
-    private final ProductBundleApi productBundleApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RemoveProductBundleHandler(ProductBundleApi productBundleApi) {
-        this.productBundleApi = productBundleApi;
+    public RemoveProductBundleHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<Void> doHandle(RemoveProductBundleCommand cmd) {
-        return productBundleApi.delete(cmd.productBundleId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productBundleId(), null).then();
     }
 }

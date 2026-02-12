@@ -1,8 +1,8 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductLimitApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductLimitCommand;
 import reactor.core.publisher.Mono;
 
@@ -12,16 +12,16 @@ import java.util.UUID;
 @CommandHandlerComponent
 public class RegisterProductLimitHandler extends CommandHandler<RegisterProductLimitCommand, UUID> {
 
-    private final ProductLimitApi productLimitApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RegisterProductLimitHandler(ProductLimitApi productLimitApi) {
-        this.productLimitApi = productLimitApi;
+    public RegisterProductLimitHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductLimitCommand cmd) {
-        return productLimitApi.createProductLimit(cmd.getProductId(), cmd, UUID.randomUUID().toString())
-                .mapNotNull(productLimitDTO ->
-                        Objects.requireNonNull(Objects.requireNonNull(productLimitDTO)).getProductLimitId());
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productConfigurationDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }
 }

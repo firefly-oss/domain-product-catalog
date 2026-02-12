@@ -1,8 +1,8 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductPricingLocalizationApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductPricingLocalizationCommand;
 import reactor.core.publisher.Mono;
 
@@ -12,16 +12,16 @@ import java.util.UUID;
 @CommandHandlerComponent
 public class RegisterProductPricingLocalizationHandler extends CommandHandler<RegisterProductPricingLocalizationCommand, UUID> {
 
-    private final ProductPricingLocalizationApi productPricingLocalizationApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RegisterProductPricingLocalizationHandler(ProductPricingLocalizationApi productPricingLocalizationApi) {
-        this.productPricingLocalizationApi = productPricingLocalizationApi;
+    public RegisterProductPricingLocalizationHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductPricingLocalizationCommand cmd) {
-        return productPricingLocalizationApi.createLocalization(cmd.getProductPricingId(), cmd.getProductPricingId(), cmd, UUID.randomUUID().toString())
-                .mapNotNull(productPricingLocalizationDTO ->
-                        Objects.requireNonNull(Objects.requireNonNull(productPricingLocalizationDTO)).getProductPricingLocalizationId());
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productConfigurationDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }
 }

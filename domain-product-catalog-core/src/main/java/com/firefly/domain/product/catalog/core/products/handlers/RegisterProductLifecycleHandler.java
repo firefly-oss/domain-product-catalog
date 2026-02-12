@@ -1,8 +1,8 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductLifecycleApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductLifecycleCommand;
 import reactor.core.publisher.Mono;
 
@@ -12,16 +12,16 @@ import java.util.UUID;
 @CommandHandlerComponent
 public class RegisterProductLifecycleHandler extends CommandHandler<RegisterProductLifecycleCommand, UUID> {
 
-    private final ProductLifecycleApi productLifecycleApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RegisterProductLifecycleHandler(ProductLifecycleApi productLifecycleApi) {
-        this.productLifecycleApi = productLifecycleApi;
+    public RegisterProductLifecycleHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductLifecycleCommand cmd) {
-        return productLifecycleApi.createProductLifecycle(cmd.getProductId(), cmd, UUID.randomUUID().toString())
-                .mapNotNull(productLifecycleDTO ->
-                        Objects.requireNonNull(Objects.requireNonNull(productLifecycleDTO)).getProductLifecycleId());
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productConfigurationDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }
 }

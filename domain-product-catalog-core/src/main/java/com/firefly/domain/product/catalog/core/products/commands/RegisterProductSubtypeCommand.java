@@ -16,8 +16,8 @@
 
 package com.firefly.domain.product.catalog.core.products.commands;
 
-import com.firefly.common.cqrs.command.Command;
-import com.firefly.core.product.sdk.model.ProductCategorySubtypeDTO;
+import org.fireflyframework.cqrs.command.Command;
+import com.firefly.core.product.sdk.model.ProductConfigurationDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,12 +25,12 @@ import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class RegisterProductSubtypeCommand extends ProductCategorySubtypeDTO implements Command<UUID> {
+public class RegisterProductSubtypeCommand extends ProductConfigurationDTO implements Command<UUID> {
 
     private UUID productCategoryId;
 
     public RegisterProductSubtypeCommand withProductCategoryId(UUID productCategoryId) {
-        this.setProductCategoryId(productCategoryId);
+        this.productCategoryId = productCategoryId;
         return this;
     }
 

@@ -1,7 +1,7 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductDocumentationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductDocumentationCommand;
 import reactor.core.publisher.Mono;
@@ -17,6 +17,6 @@ public class RemoveProductDocumentationHandler extends CommandHandler<RemoveProd
 
     @Override
     protected Mono<Void> doHandle(RemoveProductDocumentationCommand cmd) {
-        return productDocumentationApi.deleteDocumentation(cmd.productId(), cmd.productDocumentationId()).then();
+        return productDocumentationApi.deleteDocumentation(cmd.productId(), cmd.productDocumentationId(), null).then();
     }
 }

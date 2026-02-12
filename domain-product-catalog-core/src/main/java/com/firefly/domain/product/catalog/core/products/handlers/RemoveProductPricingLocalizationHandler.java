@@ -1,22 +1,22 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductPricingLocalizationApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductPricingLocalizationCommand;
 import reactor.core.publisher.Mono;
 
 @CommandHandlerComponent
 public class RemoveProductPricingLocalizationHandler extends CommandHandler<RemoveProductPricingLocalizationCommand, Void> {
 
-    private final ProductPricingLocalizationApi productPricingLocalizationApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RemoveProductPricingLocalizationHandler(ProductPricingLocalizationApi productPricingLocalizationApi) {
-        this.productPricingLocalizationApi = productPricingLocalizationApi;
+    public RemoveProductPricingLocalizationHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<Void> doHandle(RemoveProductPricingLocalizationCommand cmd) {
-        return productPricingLocalizationApi.deleteLocalization(cmd.productId(), cmd.productPricingId(), cmd.productPricingLocalizationId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productPricingLocalizationId(), null).then();
     }
 }

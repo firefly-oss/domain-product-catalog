@@ -1,22 +1,22 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.ProductLifecycleApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductLifecycleCommand;
 import reactor.core.publisher.Mono;
 
 @CommandHandlerComponent
 public class RemoveProductLifecycleHandler extends CommandHandler<RemoveProductLifecycleCommand, Void> {
 
-    private final ProductLifecycleApi productLifecycleApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RemoveProductLifecycleHandler(ProductLifecycleApi productLifecycleApi) {
-        this.productLifecycleApi = productLifecycleApi;
+    public RemoveProductLifecycleHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<Void> doHandle(RemoveProductLifecycleCommand cmd) {
-        return productLifecycleApi.deleteProductLifecycle(cmd.productId(), cmd.productLifecycleId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productLifecycleId(), null).then();
     }
 }

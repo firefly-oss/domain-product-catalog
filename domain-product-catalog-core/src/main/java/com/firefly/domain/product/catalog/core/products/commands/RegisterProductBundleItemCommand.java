@@ -16,8 +16,8 @@
 
 package com.firefly.domain.product.catalog.core.products.commands;
 
-import com.firefly.common.cqrs.command.Command;
-import com.firefly.core.product.sdk.model.ProductBundleItemDTO;
+import org.fireflyframework.cqrs.command.Command;
+import com.firefly.core.product.sdk.model.ProductConfigurationDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,12 +25,11 @@ import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class RegisterProductBundleItemCommand extends ProductBundleItemDTO implements Command<UUID> {
+public class RegisterProductBundleItemCommand extends ProductConfigurationDTO implements Command<UUID> {
     private UUID productBundleId;
-    private UUID productId;
 
     public RegisterProductBundleItemCommand withProductBundleId(UUID productBundleId) {
-        this.setProductBundleId(productBundleId);
+        this.productBundleId = productBundleId;
         return this;
     }
 

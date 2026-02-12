@@ -1,23 +1,12 @@
 package com.firefly.domain.product.catalog.infra;
 
-import com.firefly.core.product.sdk.api.FeeApplicationRuleApi;
-import com.firefly.core.product.sdk.api.FeeStructureApi;
 import com.firefly.core.product.sdk.api.ProductApi;
-import com.firefly.core.product.sdk.api.ProductBundleApi;
-import com.firefly.core.product.sdk.api.ProductBundleItemApi;
 import com.firefly.core.product.sdk.api.ProductCategoryApi;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.core.product.sdk.api.ProductDocumentationApi;
 import com.firefly.core.product.sdk.api.ProductDocumentationRequirementsApi;
-import com.firefly.core.product.sdk.api.ProductFeatureApi;
-import com.firefly.core.product.sdk.api.ProductFeeComponentApi;
-import com.firefly.core.product.sdk.api.ProductFeeStructureApi;
-import com.firefly.core.product.sdk.api.ProductLifecycleApi;
-import com.firefly.core.product.sdk.api.ProductLimitApi;
 import com.firefly.core.product.sdk.api.ProductLocalizationApi;
-import com.firefly.core.product.sdk.api.ProductPricingApi;
-import com.firefly.core.product.sdk.api.ProductPricingLocalizationApi;
 import com.firefly.core.product.sdk.api.ProductRelationshipApi;
-import com.firefly.core.product.sdk.api.ProductSubtypeApi;
 import com.firefly.core.product.sdk.api.ProductVersionApi;
 import com.firefly.core.product.sdk.invoker.ApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,48 +35,13 @@ public class ClientFactory {
     }
 
     @Bean
-    public ProductFeeStructureApi productFeeStructureApi() {
-        return new ProductFeeStructureApi(apiClient);
-    }
-
-    @Bean
-    public FeeStructureApi feeStructureApi() {
-        return new FeeStructureApi(apiClient);
-    }
-
-    @Bean
-    public ProductBundleApi productBundleApi() {
-        return new ProductBundleApi(apiClient);
-    }
-
-    @Bean
-    public ProductFeeComponentApi productFeeComponentApi() {
-        return new ProductFeeComponentApi(apiClient);
-    }
-
-    @Bean
-    public FeeApplicationRuleApi feeApplicationRuleApi() {
-        return new FeeApplicationRuleApi(apiClient);
-    }
-
-    @Bean
-    public ProductSubtypeApi productSubtypeApi() {
-        return new ProductSubtypeApi(apiClient);
+    public ProductConfigurationApi productConfigurationApi() {
+        return new ProductConfigurationApi(apiClient);
     }
 
     @Bean
     public ProductApi productApi() {
         return new ProductApi(apiClient);
-    }
-
-    @Bean
-    public ProductBundleItemApi productBundleItemApi() {
-        return new ProductBundleItemApi(apiClient);
-    }
-
-    @Bean
-    public ProductPricingApi productPricingApi() {
-        return new ProductPricingApi(apiClient);
     }
 
     @Bean
@@ -106,21 +60,6 @@ public class ClientFactory {
     }
 
     @Bean
-    public ProductFeatureApi productFeatureApi() {
-        return new ProductFeatureApi(apiClient);
-    }
-
-    @Bean
-    public ProductLifecycleApi productLifecycleApi() {
-        return new ProductLifecycleApi(apiClient);
-    }
-
-    @Bean
-    public ProductLimitApi productLimitApi() {
-        return new ProductLimitApi(apiClient);
-    }
-
-    @Bean
     public ProductLocalizationApi productLocalizationApi() {
         return new ProductLocalizationApi(apiClient);
     }
@@ -128,11 +67,6 @@ public class ClientFactory {
     @Bean
     public ProductVersionApi productVersionApi() {
         return new ProductVersionApi(apiClient);
-    }
-
-    @Bean
-    public ProductPricingLocalizationApi productPricingLocalizationApi() {
-        return new ProductPricingLocalizationApi(apiClient);
     }
 
 }

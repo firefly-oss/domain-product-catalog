@@ -1,22 +1,22 @@
 package com.firefly.domain.product.catalog.core.products.handlers;
 
-import com.firefly.common.cqrs.annotations.CommandHandlerComponent;
-import com.firefly.common.cqrs.command.CommandHandler;
-import com.firefly.core.product.sdk.api.FeeApplicationRuleApi;
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveFeeApplicationRuleCommand;
 import reactor.core.publisher.Mono;
 
 @CommandHandlerComponent
 public class RemoveFeeApplicationRuleHandler extends CommandHandler<RemoveFeeApplicationRuleCommand, Void> {
 
-    private final FeeApplicationRuleApi feeApplicationRuleApi;
+    private final ProductConfigurationApi productConfigurationApi;
 
-    public RemoveFeeApplicationRuleHandler(FeeApplicationRuleApi feeApplicationRuleApi) {
-        this.feeApplicationRuleApi = feeApplicationRuleApi;
+    public RemoveFeeApplicationRuleHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
     }
 
     @Override
     protected Mono<Void> doHandle(RemoveFeeApplicationRuleCommand cmd) {
-        return feeApplicationRuleApi.deleteRule(cmd.feeApplicationRuleId(), cmd.componentId(), cmd.feeApplicationRuleId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.feeApplicationRuleId(), null).then();
     }
 }
