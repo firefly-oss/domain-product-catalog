@@ -38,7 +38,7 @@
 
         <dependency>
             <groupId>org.fireflyframework</groupId>
-            <artifactId>fireflyframework-domain</artifactId>
+            <artifactId>fireflyframework-starter-domain</artifactId>
         </dependency>
 
         <!-- Spring WebFlux -->
