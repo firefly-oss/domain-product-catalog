@@ -1,6 +1,5 @@
 package com.firefly.domain.product.catalog.web;
 
-import org.fireflyframework.transactional.shared.annotations.EnableTransactionalEngine;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -39,7 +38,6 @@ import org.springframework.web.reactive.config.EnableWebFlux;
                 )
         }
 )
-@EnableTransactionalEngine
 public class ProductDomainProductCatalogApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductDomainProductCatalogApplication.class, args);

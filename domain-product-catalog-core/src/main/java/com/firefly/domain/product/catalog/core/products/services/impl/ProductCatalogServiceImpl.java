@@ -11,10 +11,10 @@ import com.firefly.domain.product.catalog.core.products.workflows.GetProductInfo
 import com.firefly.domain.product.catalog.core.products.workflows.RegisterProductFeeStructureSaga;
 import com.firefly.domain.product.catalog.core.products.workflows.RegisterProductSaga;
 import com.firefly.domain.product.catalog.core.products.workflows.UpdateProductSaga;
-import org.fireflyframework.transactional.saga.core.SagaResult;
-import org.fireflyframework.transactional.saga.engine.ExpandEach;
-import org.fireflyframework.transactional.saga.engine.SagaEngine;
-import org.fireflyframework.transactional.saga.engine.StepInputs;
+import org.fireflyframework.orchestration.saga.engine.SagaResult;
+import org.fireflyframework.orchestration.saga.engine.ExpandEach;
+import org.fireflyframework.orchestration.saga.engine.SagaEngine;
+import org.fireflyframework.orchestration.saga.engine.StepInputs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -37,45 +37,45 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
     @Override
     public Mono<SagaResult> registerProduct(RegisterProductCommand command) {
         StepInputs inputs = StepInputs.builder()
-                .forStep(RegisterProductSaga::registerProductCategory, command.getProductCategory())
-                .forStep(RegisterProductSaga::registerProductSubtype, command.getProductSubtype())
-                .forStep(RegisterProductSaga::registerFeeStructure, command.getFeeStructure())
-                .forStep(RegisterProductSaga::registerProductBundle, command.getProductBundle())
-                .forStep(RegisterProductSaga::registerFeeComponent, command.getFeeComponent())
-                .forStep(RegisterProductSaga::registerFeeApplicationRule, command.getFeeApplicationRule())
-                .forStep(RegisterProductSaga::registerProduct, command.getProduct())
-                .forStep(RegisterProductSaga::registerProductFeeStructure, ExpandEach.of(command.getProductFeeStructures()))
-                .forStep(RegisterProductSaga::registerProductBundleItems, ExpandEach.of(command.getProductBundleItems()))
-                .forStep(RegisterProductSaga::registerProductPricing, command.getProductPricing())
-                .forStep(RegisterProductSaga::registerProductRelationship, ExpandEach.of(command.getProductRelationships()))
-                .forStep(RegisterProductSaga::registerProductDocumentation, ExpandEach.of(command.getProductDocumentation()))
-                .forStep(RegisterProductSaga::registerProductDocumentationRequirement, ExpandEach.of(command.getProductDocumentationRequirements()))
-                .forStep(RegisterProductSaga::registerProductFeatures, ExpandEach.of(command.getProductFeatures()))
-                .forStep(RegisterProductSaga::registerProductLifecycle, ExpandEach.of(command.getProductLifecycle()))
-                .forStep(RegisterProductSaga::registerProductLimits, ExpandEach.of(command.getProductLimits()))
-                .forStep(RegisterProductSaga::registerProductLocalization, ExpandEach.of(command.getProductLocalizations()))
-                .forStep(RegisterProductSaga::registerVersion, ExpandEach.of(command.getProductVersions()))
-                .forStep(RegisterProductSaga::registerProductPricingLocalization, command.getProductPricingLocalization())
+                .forStepId("registerProductCategory", command.getProductCategory())
+                .forStepId("registerProductSubtype", command.getProductSubtype())
+                .forStepId("registerFeeStructure", command.getFeeStructure())
+                .forStepId("registerProductBundle", command.getProductBundle())
+                .forStepId("registerFeeComponent", command.getFeeComponent())
+                .forStepId("registerFeeApplicationRule", command.getFeeApplicationRule())
+                .forStepId("registerProduct", command.getProduct())
+                .forStepId("registerProductFeeStructure", ExpandEach.of(command.getProductFeeStructures()))
+                .forStepId("registerProductBundleItems", ExpandEach.of(command.getProductBundleItems()))
+                .forStepId("registerProductPricing", command.getProductPricing())
+                .forStepId("registerProductRelationship", ExpandEach.of(command.getProductRelationships()))
+                .forStepId("registerProductDocumentation", ExpandEach.of(command.getProductDocumentation()))
+                .forStepId("registerProductDocumentationRequirement", ExpandEach.of(command.getProductDocumentationRequirements()))
+                .forStepId("registerProductFeatures", ExpandEach.of(command.getProductFeatures()))
+                .forStepId("registerProductLifecycle", ExpandEach.of(command.getProductLifecycle()))
+                .forStepId("registerProductLimits", ExpandEach.of(command.getProductLimits()))
+                .forStepId("registerProductLocalization", ExpandEach.of(command.getProductLocalizations()))
+                .forStepId("registerVersion", ExpandEach.of(command.getProductVersions()))
+                .forStepId("registerProductPricingLocalization", command.getProductPricingLocalization())
 
                 .build();
 
-        return engine.execute(RegisterProductSaga.class, inputs);
+        return engine.execute("RegisterProductSaga", inputs);
     }
 
     @Override
     public Mono<SagaResult> updateProduct(UpdateProductInfoCommand updateProductInfoCommand) {
         StepInputs inputs = StepInputs.builder()
-                .forStep(UpdateProductSaga::updateProduct, updateProductInfoCommand)
+                .forStepId("updateProduct", updateProductInfoCommand)
                 .build();
-        return engine.execute(UpdateProductSaga.class, inputs);
+        return engine.execute("UpdateProductSaga", inputs);
     }
 
     @Override
     public Mono<SagaResult> linkPostingRuleSet(RegisterProductFeeStructureCommand registerProductFeeStructureCommand) {
         StepInputs inputs = StepInputs.builder()
-                .forStep(RegisterProductFeeStructureSaga::registerProductFeeStructure, registerProductFeeStructureCommand)
+                .forStepId("registerProductFeeStructure", registerProductFeeStructureCommand)
                 .build();
-        return engine.execute(RegisterProductFeeStructureSaga.class, inputs);
+        return engine.execute("RegisterProductFeeStructureSaga", inputs);
     }
 
     @Override

@@ -1,5 +1,5 @@
 package com.firefly.domain.product.catalog.core.products.services;
-import org.fireflyframework.transactional.saga.core.SagaResult;
+import org.fireflyframework.orchestration.saga.engine.SagaResult;
 
 import com.firefly.core.product.sdk.model.ProductDTO;
 import com.firefly.domain.product.catalog.core.products.commands.RegisterProductCommand;
