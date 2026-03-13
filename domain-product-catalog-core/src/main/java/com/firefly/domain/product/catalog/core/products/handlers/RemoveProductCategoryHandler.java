@@ -17,6 +17,6 @@ public class RemoveProductCategoryHandler extends CommandHandler<RemoveProductCa
 
     @Override
     protected Mono<Void> doHandle(RemoveProductCategoryCommand cmd) {
-        return productCategoryApi.deleteCategory(cmd.productCategoryId(), null).then();
+        return productCategoryApi.deleteCategory(cmd.productCategoryId()).then();
     }
 }

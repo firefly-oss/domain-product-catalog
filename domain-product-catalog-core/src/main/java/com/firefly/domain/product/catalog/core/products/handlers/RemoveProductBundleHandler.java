@@ -17,6 +17,6 @@ public class RemoveProductBundleHandler extends CommandHandler<RemoveProductBund
 
     @Override
     protected Mono<Void> doHandle(RemoveProductBundleCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productBundleId(), null).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productBundleId()).then();
     }
 }

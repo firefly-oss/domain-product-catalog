@@ -17,6 +17,6 @@ public class RemoveProductDocumentationRequirementHandler extends CommandHandler
 
     @Override
     protected Mono<Void> doHandle(RemoveProductDocumentationRequirementCommand cmd) {
-        return productDocumentationRequirementsApi.deleteDocumentationRequirement(cmd.productId(), cmd.productDocumentationRequirementId(), null).then();
+        return productDocumentationRequirementsApi.deleteDocumentationRequirement(cmd.productId(), cmd.productDocumentationRequirementId()).then();
     }
 }

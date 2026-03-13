@@ -20,7 +20,7 @@ public class UpdateProductHandler extends CommandHandler<UpdateProductInfoComman
 
     @Override
     protected Mono<UUID> doHandle(UpdateProductInfoCommand cmd) {
-        return productApi.updateProduct(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productApi.updateProduct(cmd.getProductId(), cmd)
                 .mapNotNull(productDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productDTO).getProductId()));
     }

@@ -17,6 +17,6 @@ public class RemoveProductVersionHandler extends CommandHandler<RemoveProductVer
 
     @Override
     protected Mono<Void> doHandle(RemoveProductVersionCommand cmd) {
-        return productVersionApi.deleteProductVersion(cmd.productId(), cmd.productVersionId(), null).then();
+        return productVersionApi.deleteProductVersion(cmd.productId(), cmd.productVersionId()).then();
     }
 }

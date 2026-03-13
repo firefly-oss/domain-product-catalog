@@ -17,6 +17,6 @@ public class RemoveProductSubtypeHandler extends CommandHandler<RemoveProductSub
 
     @Override
     protected Mono<Void> doHandle(RemoveProductSubtypeCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productSubtypeId(), null).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productSubtypeId()).then();
     }
 }

@@ -20,7 +20,7 @@ public class RegisterProductDocumentationRequirementHandler extends CommandHandl
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductDocumentationRequirementCommand cmd) {
-        return productDocumentationRequirementsApi.createDocumentationRequirement(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productDocumentationRequirementsApi.createDocumentationRequirement(cmd.getProductId(), cmd)
                 .mapNotNull(productDocumentationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productDocumentationDTO)).getProductDocRequirementId());
     }

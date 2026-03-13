@@ -20,7 +20,7 @@ public class RegisterFeeStructureHandler extends CommandHandler<RegisterFeeStruc
 
     @Override
     protected Mono<UUID> doHandle(RegisterFeeStructureCommand cmd) {
-        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd)
                 .mapNotNull(productConfigurationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }

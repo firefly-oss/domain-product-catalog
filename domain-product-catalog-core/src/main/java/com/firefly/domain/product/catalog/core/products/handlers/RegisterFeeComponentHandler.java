@@ -20,7 +20,7 @@ public class RegisterFeeComponentHandler extends CommandHandler<RegisterFeeCompo
 
     @Override
     protected Mono<UUID> doHandle(RegisterFeeComponentCommand cmd) {
-        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd)
                 .mapNotNull(productConfigurationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }

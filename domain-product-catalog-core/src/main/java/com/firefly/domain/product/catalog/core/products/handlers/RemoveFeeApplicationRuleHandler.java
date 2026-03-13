@@ -17,6 +17,6 @@ public class RemoveFeeApplicationRuleHandler extends CommandHandler<RemoveFeeApp
 
     @Override
     protected Mono<Void> doHandle(RemoveFeeApplicationRuleCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.feeApplicationRuleId(), null).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.feeApplicationRuleId()).then();
     }
 }

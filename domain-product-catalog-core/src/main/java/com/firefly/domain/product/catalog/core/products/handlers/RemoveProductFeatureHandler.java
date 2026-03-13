@@ -17,6 +17,6 @@ public class RemoveProductFeatureHandler extends CommandHandler<RemoveProductFea
 
     @Override
     protected Mono<Void> doHandle(RemoveProductFeatureCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productFeatureId(), null).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productFeatureId()).then();
     }
 }

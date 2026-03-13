@@ -17,6 +17,6 @@ public class RemoveProductDocumentationHandler extends CommandHandler<RemoveProd
 
     @Override
     protected Mono<Void> doHandle(RemoveProductDocumentationCommand cmd) {
-        return productDocumentationApi.deleteDocumentation(cmd.productId(), cmd.productDocumentationId(), null).then();
+        return productDocumentationApi.deleteDocumentation(cmd.productId(), cmd.productDocumentationId()).then();
     }
 }

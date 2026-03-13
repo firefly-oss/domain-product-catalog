@@ -20,7 +20,7 @@ public class RegisterProductVersionHandler extends CommandHandler<RegisterProduc
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductVersionCommand cmd) {
-        return productVersionApi.createProductVersion(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productVersionApi.createProductVersion(cmd.getProductId(), cmd)
                 .mapNotNull(productVersionDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productVersionDTO)).getProductVersionId());
     }

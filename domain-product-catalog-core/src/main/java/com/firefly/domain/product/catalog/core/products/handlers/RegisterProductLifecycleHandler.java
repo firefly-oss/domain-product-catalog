@@ -20,7 +20,7 @@ public class RegisterProductLifecycleHandler extends CommandHandler<RegisterProd
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductLifecycleCommand cmd) {
-        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd)
                 .mapNotNull(productConfigurationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }

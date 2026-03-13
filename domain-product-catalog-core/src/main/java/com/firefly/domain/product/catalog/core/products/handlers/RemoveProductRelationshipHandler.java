@@ -17,6 +17,6 @@ public class RemoveProductRelationshipHandler extends CommandHandler<RemoveProdu
 
     @Override
     protected Mono<Void> doHandle(RemoveProductRelationshipCommand cmd) {
-        return productRelationshipApi.deleteRelationship(cmd.productId(), cmd.productRelationshipId(), null).then();
+        return productRelationshipApi.deleteRelationship(cmd.productId(), cmd.productRelationshipId()).then();
     }
 }

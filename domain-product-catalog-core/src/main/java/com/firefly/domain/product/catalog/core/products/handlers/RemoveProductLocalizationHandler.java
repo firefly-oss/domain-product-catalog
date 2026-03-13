@@ -17,6 +17,6 @@ public class RemoveProductLocalizationHandler extends CommandHandler<RemoveProdu
 
     @Override
     protected Mono<Void> doHandle(RemoveProductLocalizationCommand cmd) {
-        return productLocalizationApi.deleteLocalization(cmd.productId(), cmd.productLocalizationId(), null).then();
+        return productLocalizationApi.deleteLocalization(cmd.productId(), cmd.productLocalizationId()).then();
     }
 }

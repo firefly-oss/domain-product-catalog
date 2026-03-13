@@ -17,6 +17,6 @@ public class RemoveProductLimitHandler extends CommandHandler<RemoveProductLimit
 
     @Override
     protected Mono<Void> doHandle(RemoveProductLimitCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productLimitId(), null).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productLimitId()).then();
     }
 }

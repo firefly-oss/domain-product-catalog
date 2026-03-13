@@ -20,7 +20,7 @@ public class RegisterProductLimitHandler extends CommandHandler<RegisterProductL
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductLimitCommand cmd) {
-        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd)
                 .mapNotNull(productConfigurationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }

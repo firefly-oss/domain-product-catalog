@@ -20,7 +20,7 @@ public class RegisterProductLocalizationHandler extends CommandHandler<RegisterP
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductLocalizationCommand cmd) {
-        return productLocalizationApi.createLocalization(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+        return productLocalizationApi.createLocalization(cmd.getProductId(), cmd)
                 .mapNotNull(productLocalizationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productLocalizationDTO)).getProductLocalizationId());
     }
