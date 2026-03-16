@@ -5,6 +5,7 @@ import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductSubtypeCommand;
 import reactor.core.publisher.Mono;
+import java.util.UUID;
 
 @CommandHandlerComponent
 public class RemoveProductSubtypeHandler extends CommandHandler<RemoveProductSubtypeCommand, Void> {
@@ -17,6 +18,6 @@ public class RemoveProductSubtypeHandler extends CommandHandler<RemoveProductSub
 
     @Override
     protected Mono<Void> doHandle(RemoveProductSubtypeCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productSubtypeId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.productSubtypeId(), UUID.randomUUID().toString()).then();
     }
 }

@@ -5,6 +5,7 @@ import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductConfigurationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveFeeComponentCommand;
 import reactor.core.publisher.Mono;
+import java.util.UUID;
 
 @CommandHandlerComponent
 public class RemoveFeeComponentHandler extends CommandHandler<RemoveFeeComponentCommand, Void> {
@@ -17,6 +18,6 @@ public class RemoveFeeComponentHandler extends CommandHandler<RemoveFeeComponent
 
     @Override
     protected Mono<Void> doHandle(RemoveFeeComponentCommand cmd) {
-        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.feeComponentId()).then();
+        return productConfigurationApi.deleteConfiguration(cmd.productId(), cmd.feeComponentId(), UUID.randomUUID().toString()).then();
     }
 }

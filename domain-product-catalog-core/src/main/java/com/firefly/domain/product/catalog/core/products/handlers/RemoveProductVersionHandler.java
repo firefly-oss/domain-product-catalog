@@ -5,6 +5,7 @@ import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductVersionApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductVersionCommand;
 import reactor.core.publisher.Mono;
+import java.util.UUID;
 
 @CommandHandlerComponent
 public class RemoveProductVersionHandler extends CommandHandler<RemoveProductVersionCommand, Void> {
@@ -17,6 +18,6 @@ public class RemoveProductVersionHandler extends CommandHandler<RemoveProductVer
 
     @Override
     protected Mono<Void> doHandle(RemoveProductVersionCommand cmd) {
-        return productVersionApi.deleteProductVersion(cmd.productId(), cmd.productVersionId()).then();
+        return productVersionApi.deleteProductVersion(cmd.productId(), cmd.productVersionId(), UUID.randomUUID().toString()).then();
     }
 }

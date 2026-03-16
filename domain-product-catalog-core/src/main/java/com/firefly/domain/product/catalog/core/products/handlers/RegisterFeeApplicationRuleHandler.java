@@ -20,7 +20,7 @@ public class RegisterFeeApplicationRuleHandler extends CommandHandler<RegisterFe
 
     @Override
     protected Mono<UUID> doHandle(RegisterFeeApplicationRuleCommand cmd) {
-        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd)
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
                 .mapNotNull(productConfigurationDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
     }

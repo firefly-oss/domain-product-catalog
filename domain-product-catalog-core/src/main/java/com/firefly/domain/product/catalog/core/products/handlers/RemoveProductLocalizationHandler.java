@@ -5,6 +5,7 @@ import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductLocalizationApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductLocalizationCommand;
 import reactor.core.publisher.Mono;
+import java.util.UUID;
 
 @CommandHandlerComponent
 public class RemoveProductLocalizationHandler extends CommandHandler<RemoveProductLocalizationCommand, Void> {
@@ -17,6 +18,6 @@ public class RemoveProductLocalizationHandler extends CommandHandler<RemoveProdu
 
     @Override
     protected Mono<Void> doHandle(RemoveProductLocalizationCommand cmd) {
-        return productLocalizationApi.deleteLocalization(cmd.productId(), cmd.productLocalizationId()).then();
+        return productLocalizationApi.deleteLocalization(cmd.productId(), cmd.productLocalizationId(), UUID.randomUUID().toString()).then();
     }
 }

@@ -20,7 +20,7 @@ public class RegisterProductCategoryHandler extends CommandHandler<RegisterProdu
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductCategoryCommand cmd) {
-        return productCategoryApi.createCategory(cmd)
+        return productCategoryApi.createCategory(cmd, UUID.randomUUID().toString())
                 .mapNotNull(naturalPersonDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(naturalPersonDTO)).getProductCategoryId());
     }

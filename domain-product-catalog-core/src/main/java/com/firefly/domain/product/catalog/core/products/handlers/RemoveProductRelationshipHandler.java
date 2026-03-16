@@ -5,6 +5,7 @@ import org.fireflyframework.cqrs.command.CommandHandler;
 import com.firefly.core.product.sdk.api.ProductRelationshipApi;
 import com.firefly.domain.product.catalog.core.products.commands.RemoveProductRelationshipCommand;
 import reactor.core.publisher.Mono;
+import java.util.UUID;
 
 @CommandHandlerComponent
 public class RemoveProductRelationshipHandler extends CommandHandler<RemoveProductRelationshipCommand, Void> {
@@ -17,6 +18,6 @@ public class RemoveProductRelationshipHandler extends CommandHandler<RemoveProdu
 
     @Override
     protected Mono<Void> doHandle(RemoveProductRelationshipCommand cmd) {
-        return productRelationshipApi.deleteRelationship(cmd.productId(), cmd.productRelationshipId()).then();
+        return productRelationshipApi.deleteRelationship(cmd.productId(), cmd.productRelationshipId(), UUID.randomUUID().toString()).then();
     }
 }

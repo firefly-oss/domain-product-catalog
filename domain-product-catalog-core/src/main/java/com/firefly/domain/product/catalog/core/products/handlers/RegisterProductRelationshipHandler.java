@@ -20,7 +20,7 @@ public class RegisterProductRelationshipHandler extends CommandHandler<RegisterP
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductRelationshipCommand cmd) {
-        return productRelationshipApi.createRelationship(cmd.getProductId(), cmd)
+        return productRelationshipApi.createRelationship(cmd.getProductId(), cmd, UUID.randomUUID().toString())
                 .mapNotNull(relationshipDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(relationshipDTO)).getProductRelationshipId());
     }

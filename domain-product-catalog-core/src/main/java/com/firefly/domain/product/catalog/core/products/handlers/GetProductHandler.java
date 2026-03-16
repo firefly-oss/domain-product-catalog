@@ -24,6 +24,6 @@ public class GetProductHandler extends QueryHandler<ProductQuery, ProductDTO> {
 
     @Override
     protected Mono<ProductDTO> doHandle(ProductQuery cmd) {
-        return productApi.getProductById(cmd.getProductId());
+        return productApi.getProductById(cmd.getProductId(), UUID.randomUUID().toString());
     }
 }

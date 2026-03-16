@@ -21,7 +21,7 @@ public class RegisterProductHandler extends CommandHandler<RegisterProductInfoCo
 
     @Override
     protected Mono<UUID> doHandle(RegisterProductInfoCommand cmd) {
-        return productApi.createProduct(cmd)
+        return productApi.createProduct(cmd, UUID.randomUUID().toString())
                 .mapNotNull(productDTO ->
                         Objects.requireNonNull(Objects.requireNonNull(productDTO)).getProductId());
     }
