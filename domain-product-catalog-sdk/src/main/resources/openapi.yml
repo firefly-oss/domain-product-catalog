@@ -1,0 +1,853 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:18080
+  description: Generated server url
+tags:
+- name: Products
+  description: CQ queries and registration for product catalog
+paths:
+  /api/v1/products:
+    post:
+      tags:
+      - Products
+      summary: Register product
+      description: "Define product (purpose, currency, base rules)."
+      operationId: registerProduct
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterProductCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/suspend:
+    post:
+      tags:
+      - Products
+      summary: Suspend product
+      description: Temporarily suspend eligibility.
+      operationId: suspendProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/retire:
+    post:
+      tags:
+      - Products
+      summary: Retire product
+      description: Retire product; existing accounts/loans remain.
+      operationId: retireProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/resume:
+    post:
+      tags:
+      - Products
+      summary: Resume product
+      description: Resume product eligibility.
+      operationId: resumeProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/publish:
+    post:
+      tags:
+      - Products
+      summary: Publish product
+      description: Publish a sellable version (freeze linked configs).
+      operationId: publishProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/posting-rule-set:
+    post:
+      tags:
+      - Products
+      summary: Link posting rule set
+      description: Link the GL mapping ruleset to the product.
+      operationId: linkPostingRuleSet
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterProductFeeStructureCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}:
+    get:
+      tags:
+      - Products
+      summary: Get product info
+      description: Retrieve product information by product ID.
+      operationId: getProductInfo
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+components:
+  schemas:
+    RegisterFeeApplicationRuleCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        feeComponentId:
+          type: string
+          format: uuid
+    RegisterFeeComponentCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        feeStructureId:
+          type: string
+          format: uuid
+    RegisterFeeStructureCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductBundleCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductBundleItemCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        productBundleId:
+          type: string
+          format: uuid
+    RegisterProductCategoryCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productCategoryId:
+          type: string
+          format: uuid
+        categoryName:
+          type: string
+        categoryDescription:
+          type: string
+        parentCategoryId:
+          type: string
+          format: uuid
+        level:
+          type: integer
+          format: int32
+    RegisterProductCommand:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/RegisterProductInfoCommand"
+        productFeatures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductFeatureCommand"
+        productPricing:
+          $ref: "#/components/schemas/RegisterProductPricingCommand"
+        productDocumentation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductDocumentationCommand"
+        productLifecycle:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductLifecycleCommand"
+        productLimits:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductLimitCommand"
+        productLocalizations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductLocalizationCommand"
+        productVersions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductVersionCommand"
+        productFeeStructures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductFeeStructureCommand"
+        productRelationships:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductRelationshipCommand"
+        productDocumentationRequirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductDocumentationRequirementCommand"
+        productCategory:
+          $ref: "#/components/schemas/RegisterProductCategoryCommand"
+        productSubtype:
+          $ref: "#/components/schemas/RegisterProductSubtypeCommand"
+        productBundle:
+          $ref: "#/components/schemas/RegisterProductBundleCommand"
+        feeApplicationRule:
+          $ref: "#/components/schemas/RegisterFeeApplicationRuleCommand"
+        feeComponent:
+          $ref: "#/components/schemas/RegisterFeeComponentCommand"
+        feeStructure:
+          $ref: "#/components/schemas/RegisterFeeStructureCommand"
+        productBundleItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductBundleItemCommand"
+        productPricingLocalization:
+          $ref: "#/components/schemas/RegisterProductPricingLocalizationCommand"
+    RegisterProductDocumentationCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productDocumentationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        docType:
+          type: string
+          enum:
+          - TNC
+          - BROCHURE
+          - POLICY_DOC
+        documentManagerRef:
+          type: integer
+          format: int64
+        dateAdded:
+          type: string
+          format: date-time
+    RegisterProductDocumentationRequirementCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productDocRequirementId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        docType:
+          type: string
+          enum:
+          - IDENTIFICATION
+          - TAX_IDENTIFICATION
+          - PROOF_OF_ADDRESS
+          - INCOME_VERIFICATION
+          - BANK_STATEMENTS
+          - POWER_OF_ATTORNEY
+          - BUSINESS_REGISTRATION
+          - ARTICLES_OF_INCORPORATION
+          - COMPANY_BYLAWS
+          - SIGNED_CONTRACT
+          - REGULATORY_COMPLIANCE
+          - CREDIT_REPORT
+          - INSURANCE_POLICY
+          - OTHER
+        isMandatory:
+          type: boolean
+        description:
+          type: string
+    RegisterProductFeatureCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductFeeStructureCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        feeStructureId:
+          type: string
+          format: uuid
+    RegisterProductInfoCommand:
+      required:
+      - tenantId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        productCategoryId:
+          type: string
+          format: uuid
+        productType:
+          type: string
+          enum:
+          - FINANCIAL
+          - NON_FINANCIAL
+        productName:
+          type: string
+        productCode:
+          type: string
+        productDescription:
+          type: string
+        productStatus:
+          type: string
+          enum:
+          - PROPOSED
+          - ACTIVE
+          - RETIRED
+          - DRAFT
+        launchDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        productSubtypeId:
+          type: string
+          format: uuid
+    RegisterProductLifecycleCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductLimitCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductLocalizationCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productLocalizationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        languageCode:
+          type: string
+        localizedName:
+          type: string
+        localizedDescription:
+          type: string
+    RegisterProductPricingCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductPricingLocalizationCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        productPricingId:
+          type: string
+          format: uuid
+    RegisterProductRelationshipCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productRelationshipId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        relatedProductId:
+          type: string
+          format: uuid
+        relationshipType:
+          type: string
+          enum:
+          - PRE_REQUISITE
+          - COMPLIMENTARY
+          - UPGRADE
+          - CROSS_SELL
+        description:
+          type: string
+    RegisterProductSubtypeCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        productCategoryId:
+          type: string
+          format: uuid
+    RegisterProductVersionCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productVersionId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        versionNumber:
+          type: integer
+          format: int64
+        versionDescription:
+          type: string
+        effectiveDate:
+          type: string
+          format: date-time
+    ProductDTO:
+      required:
+      - tenantId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        productCategoryId:
+          type: string
+          format: uuid
+        productType:
+          type: string
+          enum:
+          - FINANCIAL
+          - NON_FINANCIAL
+        productName:
+          type: string
+        productCode:
+          type: string
+        productDescription:
+          type: string
+        productStatus:
+          type: string
+          enum:
+          - PROPOSED
+          - ACTIVE
+          - RETIRED
+          - DRAFT
+        launchDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
