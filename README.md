@@ -12,6 +12,10 @@ Product Domain Product Catalog is the domain orchestration layer responsible for
 
 - **Product registration** -- orchestrates the creation of a complete product definition including category, subtype, fee structure, bundle, pricing, relationships, documentation, features, lifecycle, limits, localization, and versioning in a single transactional saga.
 - **Product lifecycle management** -- publish, suspend, resume, and retire products through status transitions.
+- **Product cloning** -- atomically duplicate an existing product into DRAFT status with a new code, including its configurations, localizations, relationships and documentation requirements (`CloneProductSaga`, with per-step compensation).
+- **Retirement with migration** -- atomically flip a product to RETIRED while attaching a `MIGRATION_POINTER` configuration that references an active replacement for the grace period (`RetireWithMigrationSaga`).
+- **What-if simulation** -- project eligibility and pricing for a product against a customer profile by reading the product's existing configurations locally, without calling any pricing service.
+- **Catalog aggregation** -- serve a nested category-and-product tree for a tenant, plus version list and naive JSON-path-based version comparison.
 - **Fee structure linking** -- associate general ledger (GL) posting rule sets to products.
 - **Product information retrieval** -- query full product details via the CQRS `QueryBus`.
 - **Event-driven architecture** -- every saga step emits domain events to Kafka for downstream consumers.
@@ -67,8 +71,18 @@ domain-product-catalog (parent POM)
 | `UpdateProductSaga`             | updateProduct                                                                                                                                                                                             | None         |
 | `RegisterProductFeeStructureSaga` | registerProductFeeStructure                                                                                                                                                                             | None         |
 | `GetProductInfoSaga`            | getProductInfo (query)                                                                                                                                                                                    | None         |
+| `CloneProductSaga`              | loadSourceProduct -> createClonedProduct -> cloneConfigurations -> cloneLocalizations -> cloneRelationships -> cloneDocumentationRequirements                                                             | Step 2 deletes the cloned product; steps 3-6 iterate the stored IDs and delete each child. Read-only step 1 has an explicit no-op compensation. All create steps use `requireId(...)` so a null id in the SDK response fails the step and triggers rollback instead of silently dropping state. |
+| `RetireWithMigrationSaga`       | validateTargetProduct -> retireSourceProduct -> createMigrationPointer                                                                                                                                    | Step 2 re-applies the captured previous status via **in-place mutation** of the fetched DTO (preserves server-managed fields); step 3 deletes the `MIGRATION_POINTER` configuration. Read-only step 1 has an explicit no-op compensation. |
 
 The `RegisterProductSaga` supports **ExpandEach** for collection-type inputs, allowing multiple fee structures, bundle items, relationships, documentation entries, features, lifecycle stages, limits, localizations, and versions to be registered as parallel sub-steps.
+
+### Read-only services (no saga)
+
+| Service | Purpose |
+|---|---|
+| `ProductSimulationService` | Projects eligibility and a pricing projection by loading the product's existing configurations via `ProductConfigurationApi`. Eligibility rules are parsed from JSON config values (`minAge`, `maxAge`, `minIncome`, `maxIncome`, `allowedSegments`); pricing uses a local amortization formula (`monthlyPayment = amount * r / (1 - (1+r)^-n)`). Fail-open per-rule on parse errors, fail-closed on status != ACTIVE or missing pricing scheme. No PII logged. |
+| `ProductCatalogTreeService` | Builds a nested category tree via `ProductCategoryApi.filterCategories` then fans out `ProductApi.filterProducts` per category (bounded concurrency). Enforces a max depth of 5 and logs a warning on detected cycles. |
+| `ProductVersionService` | Lists versions via `ProductVersionApi.filterProductVersions`; compares two versions by snapshotting only business-meaningful fields (`versionNumber`, `versionDescription`, `effectiveDate`, and attached configurations) and emitting a naive JSON-path diff (`added` / `removed` / `changed`). Audit fields and IDs are excluded from the diff to avoid noise. |
 
 ### Domain Events
 
@@ -95,6 +109,19 @@ All events are published to the `domain-layer` Kafka topic:
 - `productPricingLocalization.registered`
 - `product.updated`
 - `product.retrieved`
+- `catalog.clone.source-loaded`
+- `catalog.clone.product-created`
+- `catalog.clone.configurations-created`
+- `catalog.clone.localizations-created`
+- `catalog.clone.relationships-created`
+- `catalog.clone.documentation-requirements-created`
+- `catalog.retire-with-migration.target-validated`
+- `catalog.retire-with-migration.source-retired`
+- `catalog.retire-with-migration.migration-pointer-created`
+- `catalog.tree.requested`
+- `catalog.versions.listed`
+- `catalog.versions.compared`
+- `catalog.product.simulated`
 
 ---
 
@@ -173,6 +200,12 @@ java -jar domain-product-catalog-web/target/domain-product-catalog.jar
 | POST   | `/api/v1/products/{productId}/resume`       | Resume product eligibility (status = ACTIVE)                       |
 | POST   | `/api/v1/products/{productId}/retire`       | Retire product; existing accounts/loans remain (status = RETIRED)  |
 | POST   | `/api/v1/products/{productId}/posting-rule-set` | Link a GL posting rule set (fee structure) to the product      |
+| POST   | `/api/v1/products/{productId}/clone`        | Atomically duplicate the product into DRAFT with a new code (body: `CloneProductRequest { newProductCode, tenantId? }`). Runs `CloneProductSaga`. |
+| POST   | `/api/v1/products/{productId}/simulate`     | What-if projection of eligibility + pricing for a customer profile (body: `SimulateProductRequest`). Read-only; never an error signal — missing data maps to structured ineligibility reasons. |
+| POST   | `/api/v1/products/{productId}/retire-with-migration` | Flip the source to RETIRED and attach a `MIGRATION_POINTER` pointing to `targetProductId` (body: `RetireWithMigrationRequest { targetProductId, gracePeriodEndDate, reason }`). Runs `RetireWithMigrationSaga`. |
+| GET    | `/api/v1/products/catalog-tree?tenantId={uuid}` | Nested tree of categories, subcategories and products scoped to a tenant. |
+| GET    | `/api/v1/products/{productId}/versions`     | List all versions of a product (summary form).                     |
+| GET    | `/api/v1/products/{productId}/versions/compare?v1={uuid}&v2={uuid}` | JSON-path diff (`added` / `removed` / `changed`) between two versions including their attached configurations. |
 
 ### Product Lifecycle State Machine
 
