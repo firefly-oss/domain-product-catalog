@@ -1,1407 +1,1297 @@
-{
-  "openapi": "3.0.1",
-  "info": {
-    "title": "domain-product-catalog",
-    "description": "Product Domain Product Catalog Layer Application",
-    "contact": {
-      "name": "Firefly Software Solutions Inc",
-      "email": "dev@getfirefly.io"
-    },
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "http://core.getfirefly.io/domain-product-catalog",
-      "description": "Development Environment"
-    },
-    {
-      "url": "/",
-      "description": "Local Development Environment"
-    }
-  ],
-  "tags": [
-    {
-      "name": "Products",
-      "description": "CQ queries and registration for product catalog"
-    }
-  ],
-  "paths": {
-    "/api/v1/products": {
-      "post": {
-        "tags": [
-          "Products"
-        ],
-        "summary": "Register product",
-        "description": "Define product (purpose, currency, base rules).",
-        "operationId": "registerProduct",
-        "parameters": [
-          {
-            "name": "X-Idempotency-Key",
-            "in": "header",
-            "description": "Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Party-ID",
-            "in": "header",
-            "description": "Identifier of the client (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Employee-ID",
-            "in": "header",
-            "description": "Identifier of the employee (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Service-Account-ID",
-            "in": "header",
-            "description": "Identifier of the service account (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Roles",
-            "in": "header",
-            "description": "Roles of the subject (CUSTOMER, ADMIN, CUSTOMER_SUPPORT, SUPERVISOR, MANAGER, BRANCH_STAFF, SERVICE_ACCOUNT), comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Scopes",
-            "in": "header",
-            "description": "OAuth2 scopes like contracts.read, accounts.write, comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Request-ID",
-            "in": "header",
-            "description": "Unique identifier for the request, used for traceability (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterProductCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/products/{productId}/suspend": {
-      "post": {
-        "tags": [
-          "Products"
-        ],
-        "summary": "Suspend product",
-        "description": "Temporarily suspend eligibility.",
-        "operationId": "suspendProduct",
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Idempotency-Key",
-            "in": "header",
-            "description": "Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Party-ID",
-            "in": "header",
-            "description": "Identifier of the client (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Employee-ID",
-            "in": "header",
-            "description": "Identifier of the employee (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Service-Account-ID",
-            "in": "header",
-            "description": "Identifier of the service account (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Roles",
-            "in": "header",
-            "description": "Roles of the subject (CUSTOMER, ADMIN, CUSTOMER_SUPPORT, SUPERVISOR, MANAGER, BRANCH_STAFF, SERVICE_ACCOUNT), comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Scopes",
-            "in": "header",
-            "description": "OAuth2 scopes like contracts.read, accounts.write, comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Request-ID",
-            "in": "header",
-            "description": "Unique identifier for the request, used for traceability (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/products/{productId}/retire": {
-      "post": {
-        "tags": [
-          "Products"
-        ],
-        "summary": "Retire product",
-        "description": "Retire product; existing accounts/loans remain.",
-        "operationId": "retireProduct",
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Idempotency-Key",
-            "in": "header",
-            "description": "Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Party-ID",
-            "in": "header",
-            "description": "Identifier of the client (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Employee-ID",
-            "in": "header",
-            "description": "Identifier of the employee (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Service-Account-ID",
-            "in": "header",
-            "description": "Identifier of the service account (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Roles",
-            "in": "header",
-            "description": "Roles of the subject (CUSTOMER, ADMIN, CUSTOMER_SUPPORT, SUPERVISOR, MANAGER, BRANCH_STAFF, SERVICE_ACCOUNT), comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Scopes",
-            "in": "header",
-            "description": "OAuth2 scopes like contracts.read, accounts.write, comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Request-ID",
-            "in": "header",
-            "description": "Unique identifier for the request, used for traceability (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/products/{productId}/resume": {
-      "post": {
-        "tags": [
-          "Products"
-        ],
-        "summary": "Resume product",
-        "description": "Resume product eligibility.",
-        "operationId": "resumeProduct",
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Idempotency-Key",
-            "in": "header",
-            "description": "Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Party-ID",
-            "in": "header",
-            "description": "Identifier of the client (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Employee-ID",
-            "in": "header",
-            "description": "Identifier of the employee (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Service-Account-ID",
-            "in": "header",
-            "description": "Identifier of the service account (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Roles",
-            "in": "header",
-            "description": "Roles of the subject (CUSTOMER, ADMIN, CUSTOMER_SUPPORT, SUPERVISOR, MANAGER, BRANCH_STAFF, SERVICE_ACCOUNT), comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Scopes",
-            "in": "header",
-            "description": "OAuth2 scopes like contracts.read, accounts.write, comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Request-ID",
-            "in": "header",
-            "description": "Unique identifier for the request, used for traceability (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/products/{productId}/publish": {
-      "post": {
-        "tags": [
-          "Products"
-        ],
-        "summary": "Publish product",
-        "description": "Publish a sellable version (freeze linked configs).",
-        "operationId": "publishProduct",
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Idempotency-Key",
-            "in": "header",
-            "description": "Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Party-ID",
-            "in": "header",
-            "description": "Identifier of the client (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Employee-ID",
-            "in": "header",
-            "description": "Identifier of the employee (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Service-Account-ID",
-            "in": "header",
-            "description": "Identifier of the service account (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Roles",
-            "in": "header",
-            "description": "Roles of the subject (CUSTOMER, ADMIN, CUSTOMER_SUPPORT, SUPERVISOR, MANAGER, BRANCH_STAFF, SERVICE_ACCOUNT), comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Scopes",
-            "in": "header",
-            "description": "OAuth2 scopes like contracts.read, accounts.write, comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Request-ID",
-            "in": "header",
-            "description": "Unique identifier for the request, used for traceability (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/products/{productId}/posting-rule-set": {
-      "post": {
-        "tags": [
-          "Products"
-        ],
-        "summary": "Link posting rule set",
-        "description": "Link the GL mapping ruleset to the product.",
-        "operationId": "linkPostingRuleSet",
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Idempotency-Key",
-            "in": "header",
-            "description": "Unique key for idempotent requests. If provided, ensures that identical requests with the same key will only be processed once.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Party-ID",
-            "in": "header",
-            "description": "Identifier of the client (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Employee-ID",
-            "in": "header",
-            "description": "Identifier of the employee (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Service-Account-ID",
-            "in": "header",
-            "description": "Identifier of the service account (at least one of X-Party-ID, X-Employee-ID, or X-Service-Account-ID is required)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Roles",
-            "in": "header",
-            "description": "Roles of the subject (CUSTOMER, ADMIN, CUSTOMER_SUPPORT, SUPERVISOR, MANAGER, BRANCH_STAFF, SERVICE_ACCOUNT), comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Auth-Scopes",
-            "in": "header",
-            "description": "OAuth2 scopes like contracts.read, accounts.write, comma-separated (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Request-ID",
-            "in": "header",
-            "description": "Unique identifier for the request, used for traceability (optional)",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterProductFeeStructureCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "RegisterFeeApplicationRuleCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "feeApplicationRuleId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "feeComponentId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ruleDescription": {
-            "type": "string"
-          },
-          "ruleConditions": {
-            "type": "string"
-          },
-          "effectiveDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "expiryDate": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      "RegisterFeeComponentCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "feeComponentId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "feeStructureId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "feeType": {
-            "type": "string",
-            "enum": [
-              "ORIGINATION_FEE",
-              "LATE_PAYMENT_FEE",
-              "TRANSACTION_FEE",
-              "SERVICE_FEE"
-            ]
-          },
-          "feeDescription": {
-            "type": "string"
-          },
-          "feeAmount": {
-            "type": "number"
-          },
-          "feeUnit": {
-            "type": "string",
-            "enum": [
-              "FIXED",
-              "PERCENTAGE"
-            ]
-          },
-          "applicableConditions": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterFeeStructureCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "feeStructureId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "feeStructureName": {
-            "type": "string"
-          },
-          "feeStructureDescription": {
-            "type": "string"
-          },
-          "feeStructureType": {
-            "type": "string",
-            "enum": [
-              "VERTICAL",
-              "HORIZONTAL"
-            ]
-          }
-        }
-      },
-      "RegisterProductBundleCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productBundleId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "bundleName": {
-            "type": "string"
-          },
-          "bundleDescription": {
-            "type": "string"
-          },
-          "bundleStatus": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "RETIRED",
-              "PROMO"
-            ]
-          }
-        }
-      },
-      "RegisterProductBundleItemCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productBundleItemId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productBundleId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "specialConditions": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterProductCategoryCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productCategoryId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "categoryName": {
-            "type": "string"
-          },
-          "categoryDescription": {
-            "type": "string"
-          },
-          "parentCategoryId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "RegisterProductCommand": {
-        "type": "object",
-        "properties": {
-          "product": {
-            "$ref": "#/components/schemas/RegisterProductInfoCommand"
-          },
-          "productFeatures": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductFeatureCommand"
-            }
-          },
-          "productPricing": {
-            "$ref": "#/components/schemas/RegisterProductPricingCommand"
-          },
-          "productDocumentation": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductDocumentationCommand"
-            }
-          },
-          "productLifecycle": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductLifecycleCommand"
-            }
-          },
-          "productLimits": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductLimitCommand"
-            }
-          },
-          "productLocalizations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductLocalizationCommand"
-            }
-          },
-          "productVersions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductVersionCommand"
-            }
-          },
-          "productFeeStructures": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductFeeStructureCommand"
-            }
-          },
-          "productRelationships": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductRelationshipCommand"
-            }
-          },
-          "productDocumentationRequirements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductDocumentationRequirementCommand"
-            }
-          },
-          "productCategory": {
-            "$ref": "#/components/schemas/RegisterProductCategoryCommand"
-          },
-          "productSubtype": {
-            "$ref": "#/components/schemas/RegisterProductSubtypeCommand"
-          },
-          "productBundle": {
-            "$ref": "#/components/schemas/RegisterProductBundleCommand"
-          },
-          "feeApplicationRule": {
-            "$ref": "#/components/schemas/RegisterFeeApplicationRuleCommand"
-          },
-          "feeComponent": {
-            "$ref": "#/components/schemas/RegisterFeeComponentCommand"
-          },
-          "feeStructure": {
-            "$ref": "#/components/schemas/RegisterFeeStructureCommand"
-          },
-          "productBundleItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RegisterProductBundleItemCommand"
-            }
-          },
-          "productPricingLocalization": {
-            "$ref": "#/components/schemas/RegisterProductPricingLocalizationCommand"
-          }
-        }
-      },
-      "RegisterProductDocumentationCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productDocumentationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "docType": {
-            "type": "string",
-            "enum": [
-              "TNC",
-              "BROCHURE",
-              "POLICY_DOC"
-            ]
-          },
-          "documentManagerRef": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "dateAdded": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "RegisterProductDocumentationRequirementCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productDocRequirementId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "docType": {
-            "type": "string",
-            "enum": [
-              "IDENTIFICATION",
-              "TAX_IDENTIFICATION",
-              "PROOF_OF_ADDRESS",
-              "INCOME_VERIFICATION",
-              "BANK_STATEMENTS",
-              "POWER_OF_ATTORNEY",
-              "BUSINESS_REGISTRATION",
-              "ARTICLES_OF_INCORPORATION",
-              "COMPANY_BYLAWS",
-              "SIGNED_CONTRACT",
-              "REGULATORY_COMPLIANCE",
-              "CREDIT_REPORT",
-              "INSURANCE_POLICY",
-              "OTHER"
-            ]
-          },
-          "isMandatory": {
-            "type": "boolean"
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterProductFeatureCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productFeatureId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "featureName": {
-            "type": "string"
-          },
-          "featureDescription": {
-            "type": "string"
-          },
-          "featureType": {
-            "type": "string",
-            "enum": [
-              "STANDARD",
-              "OPTIONAL",
-              "PREMIUM"
-            ]
-          },
-          "isMandatory": {
-            "type": "boolean"
-          }
-        }
-      },
-      "RegisterProductFeeStructureCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productFeeStructureId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "feeStructureId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "priority": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "RegisterProductInfoCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productSubtypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productType": {
-            "type": "string",
-            "enum": [
-              "FINANCIAL",
-              "NON_FINANCIAL"
-            ]
-          },
-          "productName": {
-            "type": "string"
-          },
-          "productCode": {
-            "type": "string"
-          },
-          "productDescription": {
-            "type": "string"
-          },
-          "productStatus": {
-            "type": "string",
-            "enum": [
-              "PROPOSED",
-              "ACTIVE",
-              "RETIRED",
-              "DRAFT"
-            ]
-          },
-          "launchDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      "RegisterProductLifecycleCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productLifecycleId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "lifecycleStatus": {
-            "type": "string",
-            "enum": [
-              "PROPOSED",
-              "ACTIVE",
-              "SUSPENDED",
-              "RETIRED"
-            ]
-          },
-          "statusStartDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "statusEndDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterProductLimitCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productLimitId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "limitType": {
-            "type": "string",
-            "enum": [
-              "CREDIT_LIMIT",
-              "WITHDRAWAL_LIMIT",
-              "SUBSCRIPTION_LIMIT"
-            ]
-          },
-          "limitValue": {
-            "type": "number"
-          },
-          "limitUnit": {
-            "type": "string"
-          },
-          "timePeriod": {
-            "type": "string",
-            "enum": [
-              "DAILY",
-              "MONTHLY",
-              "PER_TRANSACTION",
-              "NONE"
-            ]
-          },
-          "effectiveDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "expiryDate": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      "RegisterProductLocalizationCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productLocalizationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "languageCode": {
-            "type": "string"
-          },
-          "localizedName": {
-            "type": "string"
-          },
-          "localizedDescription": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterProductPricingCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productPricingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "pricingType": {
-            "type": "string",
-            "enum": [
-              "INTEREST_RATE",
-              "FEE",
-              "COVERAGE",
-              "SUBSCRIPTION"
-            ]
-          },
-          "amountValue": {
-            "type": "number"
-          },
-          "amountUnit": {
-            "type": "string"
-          },
-          "pricingCondition": {
-            "type": "string"
-          },
-          "effectiveDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "expiryDate": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      "RegisterProductPricingLocalizationCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productPricingLocalizationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productPricingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "currencyCode": {
-            "type": "string"
-          },
-          "localizedAmountValue": {
-            "type": "number"
-          }
-        }
-      },
-      "RegisterProductRelationshipCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productRelationshipId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "relatedProductId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "relationshipType": {
-            "type": "string",
-            "enum": [
-              "PRE_REQUISITE",
-              "COMPLIMENTARY",
-              "UPGRADE",
-              "CROSS_SELL"
-            ]
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterProductSubtypeCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productSubtypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productCategoryId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "subtypeName": {
-            "type": "string"
-          },
-          "subtypeDescription": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterProductVersionCommand": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dateUpdated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "productVersionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "productId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "versionNumber": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "versionDescription": {
-            "type": "string"
-          },
-          "effectiveDate": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      }
-    }
-  }
-}
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:18080
+  description: Generated server url
+tags:
+- name: Products
+  description: CQ queries and registration for product catalog
+paths:
+  /api/v1/products:
+    post:
+      tags:
+      - Products
+      summary: Register product
+      description: "Define product (purpose, currency, base rules)."
+      operationId: registerProduct
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterProductCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/suspend:
+    post:
+      tags:
+      - Products
+      summary: Suspend product
+      description: Temporarily suspend eligibility.
+      operationId: suspendProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/simulate:
+    post:
+      tags:
+      - Products
+      summary: Simulate product
+      description: Projects eligibility and pricing for the given product and customer
+        profile. Reads existing product configurations; does not create any persistent
+        artifacts.
+      operationId: simulateProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulateProductRequest"
+        required: true
+      responses:
+        "200":
+          description: Simulation outcome with eligibility flag and pricing projection.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductSimulationResponse"
+  /api/v1/products/{productId}/retire:
+    post:
+      tags:
+      - Products
+      summary: Retire product
+      description: Retire product; existing accounts/loans remain.
+      operationId: retireProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/retire-with-migration:
+    post:
+      tags:
+      - Products
+      summary: Retire with migration
+      description: Retires the source product and records a migration pointer referencing
+        an active target product for the grace period.
+      operationId: retireWithMigration
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetireWithMigrationRequest"
+        required: true
+      responses:
+        "200":
+          description: Retirement accepted; source product is set to RETIRED and a
+            MIGRATION_POINTER configuration is attached.
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/resume:
+    post:
+      tags:
+      - Products
+      summary: Resume product
+      description: Resume product eligibility.
+      operationId: resumeProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/publish:
+    post:
+      tags:
+      - Products
+      summary: Publish product
+      description: Publish a sellable version (freeze linked configs).
+      operationId: publishProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/posting-rule-set:
+    post:
+      tags:
+      - Products
+      summary: Link posting rule set
+      description: Link the GL mapping ruleset to the product.
+      operationId: linkPostingRuleSet
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterProductFeeStructureCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/clone:
+    post:
+      tags:
+      - Products
+      summary: Clone product
+      description: "Atomically duplicates a product into DRAFT status with a new code,\
+        \ including configurations, localizations, relationships and documentation\
+        \ requirements."
+      operationId: cloneProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloneProductRequest"
+        required: true
+      responses:
+        "200":
+          description: Clone accepted; the saga result is emitted in the response
+            body.
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}:
+    get:
+      tags:
+      - Products
+      summary: Get product info
+      description: Retrieve product information by product ID.
+      operationId: getProductInfo
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+  /api/v1/products/{productId}/versions:
+    get:
+      tags:
+      - Products
+      summary: List product versions
+      description: Lists all versions of a product in the order returned by the core
+        service.
+      operationId: listVersions
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Array of version summaries.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductVersionSummary"
+  /api/v1/products/{productId}/versions/compare:
+    get:
+      tags:
+      - Products
+      summary: Compare product versions
+      description: Naive JSON-path diff between two versions of the same product;
+        includes associated configurations.
+      operationId: compareVersions
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: v1
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: v2
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Added / removed / changed field lists.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VersionComparisonResponse"
+  /api/v1/products/catalog-tree:
+    get:
+      tags:
+      - Products
+      summary: Catalog tree
+      description: Returns the full category hierarchy for a tenant with products
+        attached at each level.
+      operationId: getCatalogTree
+      parameters:
+      - name: tenantId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Nested catalog tree with roots, subcategories and products."
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogTreeResponse"
+components:
+  schemas:
+    RegisterFeeApplicationRuleCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        feeComponentId:
+          type: string
+          format: uuid
+    RegisterFeeComponentCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        feeStructureId:
+          type: string
+          format: uuid
+    RegisterFeeStructureCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductBundleCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductBundleItemCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        productBundleId:
+          type: string
+          format: uuid
+    RegisterProductCategoryCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productCategoryId:
+          type: string
+          format: uuid
+        categoryName:
+          type: string
+        categoryDescription:
+          type: string
+        parentCategoryId:
+          type: string
+          format: uuid
+        level:
+          type: integer
+          format: int32
+    RegisterProductCommand:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/RegisterProductInfoCommand"
+        productFeatures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductFeatureCommand"
+        productPricing:
+          $ref: "#/components/schemas/RegisterProductPricingCommand"
+        productDocumentation:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductDocumentationCommand"
+        productLifecycle:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductLifecycleCommand"
+        productLimits:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductLimitCommand"
+        productLocalizations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductLocalizationCommand"
+        productVersions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductVersionCommand"
+        productFeeStructures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductFeeStructureCommand"
+        productRelationships:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductRelationshipCommand"
+        productDocumentationRequirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductDocumentationRequirementCommand"
+        productCategory:
+          $ref: "#/components/schemas/RegisterProductCategoryCommand"
+        productSubtype:
+          $ref: "#/components/schemas/RegisterProductSubtypeCommand"
+        productBundle:
+          $ref: "#/components/schemas/RegisterProductBundleCommand"
+        feeApplicationRule:
+          $ref: "#/components/schemas/RegisterFeeApplicationRuleCommand"
+        feeComponent:
+          $ref: "#/components/schemas/RegisterFeeComponentCommand"
+        feeStructure:
+          $ref: "#/components/schemas/RegisterFeeStructureCommand"
+        productBundleItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisterProductBundleItemCommand"
+        productPricingLocalization:
+          $ref: "#/components/schemas/RegisterProductPricingLocalizationCommand"
+    RegisterProductDocumentationCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productDocumentationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        docType:
+          type: string
+          enum:
+          - TNC
+          - BROCHURE
+          - POLICY_DOC
+        documentManagerRef:
+          type: integer
+          format: int64
+        dateAdded:
+          type: string
+          format: date-time
+    RegisterProductDocumentationRequirementCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productDocRequirementId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        docType:
+          type: string
+          enum:
+          - IDENTIFICATION
+          - TAX_IDENTIFICATION
+          - PROOF_OF_ADDRESS
+          - INCOME_VERIFICATION
+          - BANK_STATEMENTS
+          - POWER_OF_ATTORNEY
+          - BUSINESS_REGISTRATION
+          - ARTICLES_OF_INCORPORATION
+          - COMPANY_BYLAWS
+          - SIGNED_CONTRACT
+          - REGULATORY_COMPLIANCE
+          - CREDIT_REPORT
+          - INSURANCE_POLICY
+          - OTHER
+        isMandatory:
+          type: boolean
+        description:
+          type: string
+    RegisterProductFeatureCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductFeeStructureCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        feeStructureId:
+          type: string
+          format: uuid
+    RegisterProductInfoCommand:
+      required:
+      - tenantId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        productCategoryId:
+          type: string
+          format: uuid
+        productType:
+          type: string
+          enum:
+          - FINANCIAL
+          - NON_FINANCIAL
+        productName:
+          type: string
+        productCode:
+          type: string
+        productDescription:
+          type: string
+        productStatus:
+          type: string
+          enum:
+          - PROPOSED
+          - ACTIVE
+          - RETIRED
+          - DRAFT
+        launchDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        productSubtypeId:
+          type: string
+          format: uuid
+    RegisterProductLifecycleCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductLimitCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductLocalizationCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productLocalizationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        languageCode:
+          type: string
+        localizedName:
+          type: string
+        localizedDescription:
+          type: string
+    RegisterProductPricingCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+    RegisterProductPricingLocalizationCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        productPricingId:
+          type: string
+          format: uuid
+    RegisterProductRelationshipCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productRelationshipId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        relatedProductId:
+          type: string
+          format: uuid
+        relationshipType:
+          type: string
+          enum:
+          - PRE_REQUISITE
+          - COMPLIMENTARY
+          - UPGRADE
+          - CROSS_SELL
+        description:
+          type: string
+    RegisterProductSubtypeCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productConfigurationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        configType:
+          type: string
+          enum:
+          - PRICING
+          - LIMITS
+          - FEATURES
+          - CUSTOM
+        configKey:
+          type: string
+        configValue:
+          type: string
+        productCategoryId:
+          type: string
+          format: uuid
+    RegisterProductVersionCommand:
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productVersionId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        versionNumber:
+          type: integer
+          format: int64
+        versionDescription:
+          type: string
+        effectiveDate:
+          type: string
+          format: date-time
+    CustomerProfile:
+      type: object
+      properties:
+        partyId:
+          type: string
+          description: Party identifier (UUID).
+          format: uuid
+        age:
+          type: integer
+          description: Customer age in years.
+          format: int32
+        income:
+          type: number
+          description: Annual declared income.
+        segment:
+          type: string
+          description: "Segmentation code, e.g. RETAIL / PREMIUM / SME."
+      description: Customer attributes consumed by product simulation (never logged).
+    SimulateProductRequest:
+      required:
+      - amount
+      - customerProfile
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier (echo of path variable; both must match).
+          format: uuid
+        customerProfile:
+          $ref: "#/components/schemas/CustomerProfile"
+        amount:
+          type: number
+          description: Principal amount requested.
+        tenorMonths:
+          type: integer
+          description: Loan/subscription tenor in months. Optional — omit for non-amortized
+            simulations.
+          format: int32
+      description: What-if simulation input for a product.
+    PricingProjection:
+      type: object
+      properties:
+        interestRate:
+          type: number
+          description: Nominal annual interest rate as a decimal (0.045 = 4.5%).
+        monthlyPayment:
+          type: number
+          description: Projected monthly payment (null if tenor is not provided).
+        totalCost:
+          type: number
+          description: Projected total cost across tenor (null if tenor is not provided).
+        effectiveApr:
+          type: number
+          description: Effective APR including mandatory fees (best-effort from pricing
+            config).
+      description: Projected pricing breakdown for a simulation.
+    ProductSimulationResponse:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier the simulation was run for.
+          format: uuid
+        eligible:
+          type: boolean
+          description: Whether the customer is eligible for the product.
+        ineligibilityReasons:
+          type: array
+          description: Ordered list of reasons when not eligible; empty when eligible.
+          items:
+            type: string
+            description: Ordered list of reasons when not eligible; empty when eligible.
+        pricing:
+          $ref: "#/components/schemas/PricingProjection"
+      description: Result of a product simulation.
+    RetireWithMigrationRequest:
+      required:
+      - targetProductId
+      type: object
+      properties:
+        targetProductId:
+          type: string
+          description: Identifier of the active target product to migrate contracts
+            toward.
+          format: uuid
+        gracePeriodEndDate:
+          type: string
+          description: Date after which outstanding contracts on the source product
+            should be migrated.
+          format: date
+        reason:
+          type: string
+          description: Human-readable reason for retiring the source product (audit
+            trail).
+      description: "Request body for POST /api/v1/products/{productId}/retire-with-migration."
+    CloneProductRequest:
+      required:
+      - newProductCode
+      type: object
+      properties:
+        newProductCode:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Product code for the clone — must be unique within the tenant.
+        tenantId:
+          type: string
+          description: "Optional tenant override. When absent, the clone inherits\
+            \ the source product's tenant."
+          format: uuid
+      description: "Request body for POST /api/v1/products/{productId}/clone."
+    ProductDTO:
+      required:
+      - tenantId
+      type: object
+      properties:
+        dateCreated:
+          type: string
+          format: date-time
+        dateUpdated:
+          type: string
+          format: date-time
+        productId:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        productCategoryId:
+          type: string
+          format: uuid
+        productType:
+          type: string
+          enum:
+          - FINANCIAL
+          - NON_FINANCIAL
+        productName:
+          type: string
+        productCode:
+          type: string
+        productDescription:
+          type: string
+        productStatus:
+          type: string
+          enum:
+          - PROPOSED
+          - ACTIVE
+          - RETIRED
+          - DRAFT
+        launchDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+    ProductVersionSummary:
+      type: object
+      properties:
+        versionId:
+          type: string
+          description: Version identifier.
+          format: uuid
+        versionNumber:
+          type: integer
+          description: Monotonic version number.
+          format: int64
+        versionDescription:
+          type: string
+          description: Optional description.
+        effectiveDate:
+          type: string
+          description: Effective timestamp.
+          format: date-time
+        createdAt:
+          type: string
+          description: Creation timestamp.
+          format: date-time
+      description: Compact product version summary.
+    FieldDiff:
+      type: object
+      properties:
+        path:
+          type: string
+          description: JSON-path to the differing field.
+        oldValue:
+          type: string
+          description: Value from the first version (null for added fields).
+        newValue:
+          type: string
+          description: Value from the second version (null for removed fields).
+      description: Field-level diff inside a version comparison.
+    VersionComparisonResponse:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier both versions belong to.
+          format: uuid
+        versionIdA:
+          type: string
+          description: Identifier of the first version compared.
+          format: uuid
+        versionIdB:
+          type: string
+          description: Identifier of the second version compared.
+          format: uuid
+        added:
+          type: array
+          description: Fields present in version B but not in version A.
+          items:
+            $ref: "#/components/schemas/FieldDiff"
+        removed:
+          type: array
+          description: Fields present in version A but not in version B.
+          items:
+            $ref: "#/components/schemas/FieldDiff"
+        changed:
+          type: array
+          description: Fields present in both versions with different values.
+          items:
+            $ref: "#/components/schemas/FieldDiff"
+      description: Comparison of two product versions.
+    CatalogTreeResponse:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          description: Tenant identifier the tree was scoped to (echo of the input).
+          format: uuid
+        categories:
+          type: array
+          description: Top-level categories. Each carries its own subcategories and
+            products.
+          items:
+            $ref: "#/components/schemas/CategoryNode"
+      description: "Catalog tree: roots plus nested categories and products."
+    CategoryNode:
+      type: object
+      properties:
+        categoryId:
+          type: string
+          description: Category identifier.
+          format: uuid
+        name:
+          type: string
+          description: Category display name.
+        level:
+          type: integer
+          description: Hierarchy level as returned by the core service.
+          format: int32
+        subcategories:
+          type: array
+          description: Nested subcategories. Empty when this is a leaf.
+          items:
+            $ref: "#/components/schemas/CategoryNode"
+        products:
+          type: array
+          description: Products attached at this category level.
+          items:
+            $ref: "#/components/schemas/ProductSummaryInTree"
+      description: Recursive catalog tree node.
+    ProductSummaryInTree:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier.
+          format: uuid
+        productCode:
+          type: string
+          description: Business-facing product code.
+        productName:
+          type: string
+          description: Display name.
+        productStatus:
+          type: string
+          description: "Lifecycle status, e.g. ACTIVE / DRAFT / RETIRED."
+      description: Compact product descriptor embedded in a catalog tree node.

@@ -65,6 +65,42 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/v1/products/{productId}/simulate:
+    post:
+      tags:
+      - Products
+      summary: Simulate product
+      description: Projects eligibility and pricing for the given product and customer
+        profile. Reads existing product configurations; does not create any persistent
+        artifacts.
+      operationId: simulateProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulateProductRequest"
+        required: true
+      responses:
+        "200":
+          description: Simulation outcome with eligibility flag and pricing projection.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductSimulationResponse"
   /api/v1/products/{productId}/retire:
     post:
       tags:
@@ -89,6 +125,42 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/v1/products/{productId}/retire-with-migration:
+    post:
+      tags:
+      - Products
+      summary: Retire with migration
+      description: Retires the source product and records a migration pointer referencing
+        an active target product for the grace period.
+      operationId: retireWithMigration
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetireWithMigrationRequest"
+        required: true
+      responses:
+        "200":
+          description: Retirement accepted; source product is set to RETIRED and a
+            MIGRATION_POINTER configuration is attached.
           content:
             '*/*':
               schema:
@@ -183,6 +255,43 @@ paths:
             '*/*':
               schema:
                 type: object
+  /api/v1/products/{productId}/clone:
+    post:
+      tags:
+      - Products
+      summary: Clone product
+      description: "Atomically duplicates a product into DRAFT status with a new code,\
+        \ including configurations, localizations, relationships and documentation\
+        \ requirements."
+      operationId: cloneProduct
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloneProductRequest"
+        required: true
+      responses:
+        "200":
+          description: Clone accepted; the saga result is emitted in the response
+            body.
+          content:
+            '*/*':
+              schema:
+                type: object
   /api/v1/products/{productId}:
     get:
       tags:
@@ -211,6 +320,107 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDTO"
+  /api/v1/products/{productId}/versions:
+    get:
+      tags:
+      - Products
+      summary: List product versions
+      description: Lists all versions of a product in the order returned by the core
+        service.
+      operationId: listVersions
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Array of version summaries.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductVersionSummary"
+  /api/v1/products/{productId}/versions/compare:
+    get:
+      tags:
+      - Products
+      summary: Compare product versions
+      description: Naive JSON-path diff between two versions of the same product;
+        includes associated configurations.
+      operationId: compareVersions
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: v1
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: v2
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Added / removed / changed field lists.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VersionComparisonResponse"
+  /api/v1/products/catalog-tree:
+    get:
+      tags:
+      - Products
+      summary: Catalog tree
+      description: Returns the full category hierarchy for a tenant with products
+        attached at each level.
+      operationId: getCatalogTree
+      parameters:
+      - name: tenantId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Unique key for idempotent requests. If provided, ensures that\
+          \ identical requests with the same key will only be processed once."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Nested catalog tree with roots, subcategories and products."
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogTreeResponse"
 components:
   schemas:
     RegisterFeeApplicationRuleCommand:
@@ -807,6 +1017,117 @@ components:
         effectiveDate:
           type: string
           format: date-time
+    CustomerProfile:
+      type: object
+      properties:
+        partyId:
+          type: string
+          description: Party identifier (UUID).
+          format: uuid
+        age:
+          type: integer
+          description: Customer age in years.
+          format: int32
+        income:
+          type: number
+          description: Annual declared income.
+        segment:
+          type: string
+          description: "Segmentation code, e.g. RETAIL / PREMIUM / SME."
+      description: Customer attributes consumed by product simulation (never logged).
+    SimulateProductRequest:
+      required:
+      - amount
+      - customerProfile
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier (echo of path variable; both must match).
+          format: uuid
+        customerProfile:
+          $ref: "#/components/schemas/CustomerProfile"
+        amount:
+          type: number
+          description: Principal amount requested.
+        tenorMonths:
+          type: integer
+          description: Loan/subscription tenor in months. Optional — omit for non-amortized
+            simulations.
+          format: int32
+      description: What-if simulation input for a product.
+    PricingProjection:
+      type: object
+      properties:
+        interestRate:
+          type: number
+          description: Nominal annual interest rate as a decimal (0.045 = 4.5%).
+        monthlyPayment:
+          type: number
+          description: Projected monthly payment (null if tenor is not provided).
+        totalCost:
+          type: number
+          description: Projected total cost across tenor (null if tenor is not provided).
+        effectiveApr:
+          type: number
+          description: Effective APR including mandatory fees (best-effort from pricing
+            config).
+      description: Projected pricing breakdown for a simulation.
+    ProductSimulationResponse:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier the simulation was run for.
+          format: uuid
+        eligible:
+          type: boolean
+          description: Whether the customer is eligible for the product.
+        ineligibilityReasons:
+          type: array
+          description: Ordered list of reasons when not eligible; empty when eligible.
+          items:
+            type: string
+            description: Ordered list of reasons when not eligible; empty when eligible.
+        pricing:
+          $ref: "#/components/schemas/PricingProjection"
+      description: Result of a product simulation.
+    RetireWithMigrationRequest:
+      required:
+      - targetProductId
+      type: object
+      properties:
+        targetProductId:
+          type: string
+          description: Identifier of the active target product to migrate contracts
+            toward.
+          format: uuid
+        gracePeriodEndDate:
+          type: string
+          description: Date after which outstanding contracts on the source product
+            should be migrated.
+          format: date
+        reason:
+          type: string
+          description: Human-readable reason for retiring the source product (audit
+            trail).
+      description: "Request body for POST /api/v1/products/{productId}/retire-with-migration."
+    CloneProductRequest:
+      required:
+      - newProductCode
+      type: object
+      properties:
+        newProductCode:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Product code for the clone — must be unique within the tenant.
+        tenantId:
+          type: string
+          description: "Optional tenant override. When absent, the clone inherits\
+            \ the source product's tenant."
+          format: uuid
+      description: "Request body for POST /api/v1/products/{productId}/clone."
     ProductDTO:
       required:
       - tenantId
@@ -851,3 +1172,126 @@ components:
         endDate:
           type: string
           format: date
+    ProductVersionSummary:
+      type: object
+      properties:
+        versionId:
+          type: string
+          description: Version identifier.
+          format: uuid
+        versionNumber:
+          type: integer
+          description: Monotonic version number.
+          format: int64
+        versionDescription:
+          type: string
+          description: Optional description.
+        effectiveDate:
+          type: string
+          description: Effective timestamp.
+          format: date-time
+        createdAt:
+          type: string
+          description: Creation timestamp.
+          format: date-time
+      description: Compact product version summary.
+    FieldDiff:
+      type: object
+      properties:
+        path:
+          type: string
+          description: JSON-path to the differing field.
+        oldValue:
+          type: string
+          description: Value from the first version (null for added fields).
+        newValue:
+          type: string
+          description: Value from the second version (null for removed fields).
+      description: Field-level diff inside a version comparison.
+    VersionComparisonResponse:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier both versions belong to.
+          format: uuid
+        versionIdA:
+          type: string
+          description: Identifier of the first version compared.
+          format: uuid
+        versionIdB:
+          type: string
+          description: Identifier of the second version compared.
+          format: uuid
+        added:
+          type: array
+          description: Fields present in version B but not in version A.
+          items:
+            $ref: "#/components/schemas/FieldDiff"
+        removed:
+          type: array
+          description: Fields present in version A but not in version B.
+          items:
+            $ref: "#/components/schemas/FieldDiff"
+        changed:
+          type: array
+          description: Fields present in both versions with different values.
+          items:
+            $ref: "#/components/schemas/FieldDiff"
+      description: Comparison of two product versions.
+    CatalogTreeResponse:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          description: Tenant identifier the tree was scoped to (echo of the input).
+          format: uuid
+        categories:
+          type: array
+          description: Top-level categories. Each carries its own subcategories and
+            products.
+          items:
+            $ref: "#/components/schemas/CategoryNode"
+      description: "Catalog tree: roots plus nested categories and products."
+    CategoryNode:
+      type: object
+      properties:
+        categoryId:
+          type: string
+          description: Category identifier.
+          format: uuid
+        name:
+          type: string
+          description: Category display name.
+        level:
+          type: integer
+          description: Hierarchy level as returned by the core service.
+          format: int32
+        subcategories:
+          type: array
+          description: Nested subcategories. Empty when this is a leaf.
+          items:
+            $ref: "#/components/schemas/CategoryNode"
+        products:
+          type: array
+          description: Products attached at this category level.
+          items:
+            $ref: "#/components/schemas/ProductSummaryInTree"
+      description: Recursive catalog tree node.
+    ProductSummaryInTree:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product identifier.
+          format: uuid
+        productCode:
+          type: string
+          description: Business-facing product code.
+        productName:
+          type: string
+          description: Display name.
+        productStatus:
+          type: string
+          description: "Lifecycle status, e.g. ACTIVE / DRAFT / RETIRED."
+      description: Compact product descriptor embedded in a catalog tree node.
