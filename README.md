@@ -273,4 +273,4 @@ firefly.cqrs.command.tracing-enabled: true
 
 ## License
 
-Proprietary -- Firefly Software Solutions Inc.
+Proprietary -- Firefly Software Foundation.
