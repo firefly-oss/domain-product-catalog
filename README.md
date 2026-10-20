@@ -1,4 +1,17 @@
-# Product Domain Product Catalog
+<a href="https://fireflysoftware.io/openplatform/">
+<picture>
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-narrow-dark.svg">
+  <source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-narrow-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-dark.svg">
+  <img src="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-light.svg" alt="Firefly OpenPlatform - Domain Product - Catalog" width="100%">
+</picture>
+</a>
+
+# Firefly OpenPlatform - Domain Product - Catalog
+
+Developed by the Firefly Software Foundation. [dev@fireflysoftware.io](mailto:dev@fireflysoftware.io)
+
+[Website](https://fireflysoftware.io/) · [OpenPlatform](https://fireflysoftware.io/openplatform/) · [Module catalogue](https://fireflysoftware.io/openplatform/modules/)
 
 A reactive domain-layer microservice that orchestrates the full product catalog lifecycle -- from registration through publication, suspension, and retirement. Built on [FireflyFramework](https://github.com/fireflyframework/) and Spring WebFlux, this service uses CQRS and Saga orchestration to coordinate up to 19 registration steps in a single atomic workflow with automatic compensation on failure, delegating persistence to the **core-common-product-mgmt** platform service.
 
