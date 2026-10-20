@@ -59,7 +59,7 @@ springdoc:
     operationsSorter: method
     docExpansion: none
     filter: true
-  packages-to-scan: com.firefly.domain.product.catalog.web.controller
+  packages-to-scan: io.fireflysoftware.domain.product.catalog.web.controller
   paths-to-match: /api/**
 
 management:
@@ -93,7 +93,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.firefly: DEBUG
+    io.fireflysoftware: DEBUG
     org.springframework.r2dbc: DEBUG
     org.flywaydb: DEBUG
 
@@ -106,7 +106,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.firefly: DEBUG
+    io.fireflysoftware: DEBUG
     org.springframework.r2dbc: INFO
 
 springdoc:
@@ -124,7 +124,7 @@ spring:
 logging:
   level:
     root: WARN
-    com.firefly: INFO
+    io.fireflysoftware: INFO
     org.springframework: WARN
 
 springdoc:

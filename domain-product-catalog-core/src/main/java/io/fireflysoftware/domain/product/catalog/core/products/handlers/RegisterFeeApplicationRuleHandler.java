@@ -1,0 +1,27 @@
+package io.fireflysoftware.domain.product.catalog.core.products.handlers;
+
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import io.fireflysoftware.core.product.sdk.api.ProductConfigurationApi;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterFeeApplicationRuleCommand;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+import java.util.UUID;
+
+@CommandHandlerComponent
+public class RegisterFeeApplicationRuleHandler extends CommandHandler<RegisterFeeApplicationRuleCommand, UUID> {
+
+    private final ProductConfigurationApi productConfigurationApi;
+
+    public RegisterFeeApplicationRuleHandler(ProductConfigurationApi productConfigurationApi) {
+        this.productConfigurationApi = productConfigurationApi;
+    }
+
+    @Override
+    protected Mono<UUID> doHandle(RegisterFeeApplicationRuleCommand cmd) {
+        return productConfigurationApi.createConfiguration(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productConfigurationDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productConfigurationDTO)).getProductConfigurationId());
+    }
+}

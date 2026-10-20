@@ -1,0 +1,27 @@
+package io.fireflysoftware.domain.product.catalog.core.products.handlers;
+
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import io.fireflysoftware.core.product.sdk.api.ProductApi;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.UpdateProductInfoCommand;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+import java.util.UUID;
+
+@CommandHandlerComponent
+public class UpdateProductHandler extends CommandHandler<UpdateProductInfoCommand, UUID> {
+
+    private final ProductApi productApi;
+
+    public UpdateProductHandler(ProductApi productApi) {
+        this.productApi = productApi;
+    }
+
+    @Override
+    protected Mono<UUID> doHandle(UpdateProductInfoCommand cmd) {
+        return productApi.updateProduct(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productDTO).getProductId()));
+    }
+}

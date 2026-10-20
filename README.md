@@ -142,9 +142,9 @@ All events are published to the `domain-layer` Kafka topic:
 
 | Profile   | Logging Behavior                             | Swagger UI |
 |-----------|----------------------------------------------|------------|
-| `dev`     | DEBUG for `com.firefly`, R2DBC, Flyway       | Enabled    |
-| `testing` | DEBUG for `com.firefly`, INFO for R2DBC      | Enabled    |
-| `prod`    | WARN for root, INFO for `com.firefly`        | Disabled   |
+| `dev`     | DEBUG for `io.fireflysoftware`, R2DBC, Flyway       | Enabled    |
+| `testing` | DEBUG for `io.fireflysoftware`, INFO for R2DBC      | Enabled    |
+| `prod`    | WARN for root, INFO for `io.fireflysoftware`        | Disabled   |
 
 ### Build
 

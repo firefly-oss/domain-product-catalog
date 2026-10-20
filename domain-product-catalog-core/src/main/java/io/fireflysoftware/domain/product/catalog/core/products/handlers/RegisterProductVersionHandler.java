@@ -1,0 +1,27 @@
+package io.fireflysoftware.domain.product.catalog.core.products.handlers;
+
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import io.fireflysoftware.core.product.sdk.api.ProductVersionApi;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductVersionCommand;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+import java.util.UUID;
+
+@CommandHandlerComponent
+public class RegisterProductVersionHandler extends CommandHandler<RegisterProductVersionCommand, UUID> {
+
+    private final ProductVersionApi productVersionApi;
+
+    public RegisterProductVersionHandler(ProductVersionApi productVersionApi) {
+        this.productVersionApi = productVersionApi;
+    }
+
+    @Override
+    protected Mono<UUID> doHandle(RegisterProductVersionCommand cmd) {
+        return productVersionApi.createProductVersion(cmd.getProductId(), cmd, UUID.randomUUID().toString())
+                .mapNotNull(productVersionDTO ->
+                        Objects.requireNonNull(Objects.requireNonNull(productVersionDTO)).getProductVersionId());
+    }
+}

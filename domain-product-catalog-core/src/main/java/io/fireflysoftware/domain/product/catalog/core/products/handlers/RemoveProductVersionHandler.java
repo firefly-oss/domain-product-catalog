@@ -1,0 +1,23 @@
+package io.fireflysoftware.domain.product.catalog.core.products.handlers;
+
+import org.fireflyframework.cqrs.annotations.CommandHandlerComponent;
+import org.fireflyframework.cqrs.command.CommandHandler;
+import io.fireflysoftware.core.product.sdk.api.ProductVersionApi;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductVersionCommand;
+import reactor.core.publisher.Mono;
+import java.util.UUID;
+
+@CommandHandlerComponent
+public class RemoveProductVersionHandler extends CommandHandler<RemoveProductVersionCommand, Void> {
+
+    private final ProductVersionApi productVersionApi;
+
+    public RemoveProductVersionHandler(ProductVersionApi productVersionApi) {
+        this.productVersionApi = productVersionApi;
+    }
+
+    @Override
+    protected Mono<Void> doHandle(RemoveProductVersionCommand cmd) {
+        return productVersionApi.deleteProductVersion(cmd.productId(), cmd.productVersionId(), UUID.randomUUID().toString()).then();
+    }
+}
