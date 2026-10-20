@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>domain-product-catalog-core</artifactId>
+    <name>domain-product-catalog-core</name>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>

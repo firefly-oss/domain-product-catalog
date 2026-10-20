@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>domain-product-catalog-infra</artifactId>
+    <name>domain-product-catalog-infra</name>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
