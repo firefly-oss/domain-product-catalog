@@ -1,9 +1,9 @@
 <a href="https://fireflysoftware.io/openplatform/">
 <picture>
-  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-narrow-dark.svg">
-  <source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-narrow-light.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-dark.svg">
-  <img src="https://raw.githubusercontent.com/firefly-oss/.github/main/profile/assets/banner-light.svg" alt="Firefly OpenPlatform - Domain Product - Catalog" width="100%">
+  <source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-narrow-dark.svg">
+  <source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-narrow-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-dark.svg">
+  <img src="https://raw.githubusercontent.com/fireflysoftwaresolutions/.github/main/profile/assets/banner-light.svg" alt="Firefly OpenPlatform - Domain Product - Catalog" width="100%">
 </picture>
 </a>
 
@@ -23,7 +23,7 @@ A reactive domain-layer microservice that orchestrates the full product catalog 
 
 Product Domain Product Catalog is the domain orchestration layer responsible for:
 
-- **Product registration** -- orchestrates the creation of a complete product definition including category, subtype, fee structure, bundle, pricing, relationships, documentation, features, lifecycle, limits, localization, and versioning in a single transactional saga.
+- **Product registration** -- creates a product with optional category, versions, relationships, localizations, documents, and `product_configuration` rows. Fees, features, limits, lifecycle rows, and bundles are not separate aggregates. A product that is not a loan succeeds without amount, rate, or fee configuration.
 - **Product lifecycle management** -- publish, suspend, resume, and retire products through status transitions.
 - **Fee structure linking** -- associate general ledger (GL) posting rule sets to products.
 - **Product information retrieval** -- query full product details via the CQRS `QueryBus`.
@@ -76,12 +76,13 @@ domain-product-catalog (parent POM)
 
 | Saga                            | Steps                                                                                                                                                                                                     | Compensation |
 |---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
-| `RegisterProductSaga`           | registerProductCategory -> registerProductSubtype -> registerFeeStructure -> registerProductBundle -> registerFeeComponent -> registerFeeApplicationRule -> registerProduct -> registerProductFeeStructure -> registerProductBundleItems -> registerProductPricing -> registerProductRelationship -> registerProductDocumentation -> registerProductDocumentationRequirement -> registerProductFeatures -> registerProductLifecycle -> registerProductLimits -> registerProductLocalization -> registerVersion -> registerProductPricingLocalization | Full rollback via compensate methods for every step |
-| `UpdateProductSaga`             | updateProduct                                                                                                                                                                                             | None         |
+| `RegisterProductSaga`           | category (optional) -> product -> configuration, relationships, documents, localizations, and versions | Each created row is deleted if a later step fails. A product without loan pricing still succeeds. |
+| `UpdateProductSaga`             | read product -> update product | Restores the previous product |
+| `ChangeProductStatusSaga`       | read product -> status change | Restores the previous status. Delete is only for draft or proposed. |
 | `RegisterProductFeeStructureSaga` | registerProductFeeStructure                                                                                                                                                                             | None         |
 | `GetProductInfoSaga`            | getProductInfo (query)                                                                                                                                                                                    | None         |
 
-The `RegisterProductSaga` supports **ExpandEach** for collection-type inputs, allowing multiple fee structures, bundle items, relationships, documentation entries, features, lifecycle stages, limits, localizations, and versions to be registered as parallel sub-steps.
+The `RegisterProductSaga` supports **ExpandEach** for configuration, relationships, documents, localizations, and versions. Those collections can be empty.
 
 ### Domain Events
 

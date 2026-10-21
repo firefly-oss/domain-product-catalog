@@ -2,9 +2,7 @@ package io.fireflysoftware.domain.product.catalog.web.controller;
 
 import io.fireflysoftware.core.product.sdk.model.ProductDTO;
 import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductCommand;
-import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductFeeStructureCommand;
-import io.fireflysoftware.domain.product.catalog.core.products.commands.UpdateProductInfoCommand;
-import io.fireflysoftware.domain.product.catalog.core.products.queries.ProductQuery;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductConfigurationCommand;
 import io.fireflysoftware.domain.product.catalog.core.products.services.ProductCatalogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,46 +29,38 @@ public class ProductCatalogController {
                 .thenReturn(ResponseEntity.ok().build());
     }
 
-    @Operation(summary = "Publish product", description = "Publish a sellable version (freeze linked configs).")
+    @Operation(summary = "Publish product", description = "Moves a draft or proposed product to active.")
     @PostMapping("/{productId}/publish")
     public Mono<ResponseEntity<Object>> publishProduct(@PathVariable UUID productId) {
-        return productCatalogService.updateProduct(new UpdateProductInfoCommand()
-                        .withProductId(productId)
-                        .withProductStatus(ProductDTO.ProductStatusEnum.ACTIVE))
+        return productCatalogService.changeStatus(productId, "ACTIVE")
                 .thenReturn(ResponseEntity.ok().build());
     }
 
     @Operation(summary = "Suspend product", description = "Temporarily suspend eligibility.")
     @PostMapping("/{productId}/suspend")
     public Mono<ResponseEntity<Object>> suspendProduct(@PathVariable UUID productId) {
-        return productCatalogService.updateProduct(new UpdateProductInfoCommand()
-                        .withProductId(productId)
-                        .withProductStatus(ProductDTO.ProductStatusEnum.PROPOSED))
+        return productCatalogService.changeStatus(productId, "SUSPENDED")
                 .thenReturn(ResponseEntity.ok().build());
     }
 
-    @Operation(summary = "Resume product", description = "Resume product eligibility.")
+    @Operation(summary = "Resume product", description = "Returns a suspended product to active when the SDK exposes that status.")
     @PostMapping("/{productId}/resume")
     public Mono<ResponseEntity<Object>> resumeProduct(@PathVariable UUID productId) {
-        return productCatalogService.updateProduct(new UpdateProductInfoCommand()
-                        .withProductId(productId)
-                        .withProductStatus(ProductDTO.ProductStatusEnum.ACTIVE))
+        return productCatalogService.changeStatus(productId, "ACTIVE")
                 .thenReturn(ResponseEntity.ok().build());
     }
 
     @Operation(summary = "Retire product", description = "Retire product; existing accounts/loans remain.")
     @PostMapping("/{productId}/retire")
     public Mono<ResponseEntity<Object>> retireProduct(@PathVariable UUID productId) {
-        return productCatalogService.updateProduct(new UpdateProductInfoCommand()
-                        .withProductId(productId)
-                        .withProductStatus(ProductDTO.ProductStatusEnum.RETIRED))
+        return productCatalogService.changeStatus(productId, "RETIRED")
                 .thenReturn(ResponseEntity.ok().build());
     }
 
-    @Operation(summary = "Link posting rule set", description = "Link the GL mapping ruleset to the product.")
-    @PostMapping("/{productId}/posting-rule-set")
+    @Operation(summary = "Store product configuration", description = "Stores one product_configuration row. Loan fees are not a separate aggregate.")
+    @PostMapping("/{productId}/configuration")
     public Mono<ResponseEntity<Object>> linkPostingRuleSet(@PathVariable UUID productId,
-                                                           @Valid @RequestBody RegisterProductFeeStructureCommand command) {
+                                                           @Valid @RequestBody RegisterProductConfigurationCommand command) {
         return productCatalogService.linkPostingRuleSet(command.withProductId(productId))
                 .thenReturn(ResponseEntity.ok().build());
     }

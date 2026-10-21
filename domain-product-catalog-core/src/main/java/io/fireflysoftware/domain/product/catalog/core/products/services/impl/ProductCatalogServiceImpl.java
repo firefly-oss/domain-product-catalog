@@ -1,24 +1,22 @@
 package io.fireflysoftware.domain.product.catalog.core.products.services.impl;
 
-import org.fireflyframework.cqrs.query.QueryBus;
 import io.fireflysoftware.core.product.sdk.model.ProductDTO;
 import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductCommand;
-import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductFeeStructureCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductConfigurationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.ChangeProductStatusCommand;
 import io.fireflysoftware.domain.product.catalog.core.products.commands.UpdateProductInfoCommand;
 import io.fireflysoftware.domain.product.catalog.core.products.queries.ProductQuery;
 import io.fireflysoftware.domain.product.catalog.core.products.services.ProductCatalogService;
-import io.fireflysoftware.domain.product.catalog.core.products.workflows.GetProductInfoSaga;
-import io.fireflysoftware.domain.product.catalog.core.products.workflows.RegisterProductFeeStructureSaga;
-import io.fireflysoftware.domain.product.catalog.core.products.workflows.RegisterProductSaga;
-import io.fireflysoftware.domain.product.catalog.core.products.workflows.UpdateProductSaga;
-import org.fireflyframework.orchestration.saga.engine.SagaResult;
+import org.fireflyframework.cqrs.query.QueryBus;
 import org.fireflyframework.orchestration.saga.engine.ExpandEach;
 import org.fireflyframework.orchestration.saga.engine.SagaEngine;
+import org.fireflyframework.orchestration.saga.engine.SagaResult;
 import org.fireflyframework.orchestration.saga.engine.StepInputs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,10 +25,9 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
     private final SagaEngine engine;
     private final QueryBus queryBus;
 
-
     @Autowired
-    public ProductCatalogServiceImpl(SagaEngine engine, QueryBus queryBus){
-        this.engine=engine;
+    public ProductCatalogServiceImpl(SagaEngine engine, QueryBus queryBus) {
+        this.engine = engine;
         this.queryBus = queryBus;
     }
 
@@ -38,25 +35,13 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
     public Mono<SagaResult> registerProduct(RegisterProductCommand command) {
         StepInputs inputs = StepInputs.builder()
                 .forStepId("registerProductCategory", command.getProductCategory())
-                .forStepId("registerProductSubtype", command.getProductSubtype())
-                .forStepId("registerFeeStructure", command.getFeeStructure())
-                .forStepId("registerProductBundle", command.getProductBundle())
-                .forStepId("registerFeeComponent", command.getFeeComponent())
-                .forStepId("registerFeeApplicationRule", command.getFeeApplicationRule())
                 .forStepId("registerProduct", command.getProduct())
-                .forStepId("registerProductFeeStructure", ExpandEach.of(command.getProductFeeStructures()))
-                .forStepId("registerProductBundleItems", ExpandEach.of(command.getProductBundleItems()))
-                .forStepId("registerProductPricing", command.getProductPricing())
-                .forStepId("registerProductRelationship", ExpandEach.of(command.getProductRelationships()))
-                .forStepId("registerProductDocumentation", ExpandEach.of(command.getProductDocumentation()))
-                .forStepId("registerProductDocumentationRequirement", ExpandEach.of(command.getProductDocumentationRequirements()))
-                .forStepId("registerProductFeatures", ExpandEach.of(command.getProductFeatures()))
-                .forStepId("registerProductLifecycle", ExpandEach.of(command.getProductLifecycle()))
-                .forStepId("registerProductLimits", ExpandEach.of(command.getProductLimits()))
-                .forStepId("registerProductLocalization", ExpandEach.of(command.getProductLocalizations()))
-                .forStepId("registerVersion", ExpandEach.of(command.getProductVersions()))
-                .forStepId("registerProductPricingLocalization", command.getProductPricingLocalization())
-
+                .forStepId("registerProductConfiguration", ExpandEach.of(nullSafe(command.getProductConfigurations())))
+                .forStepId("registerProductRelationship", ExpandEach.of(nullSafe(command.getProductRelationships())))
+                .forStepId("registerProductDocumentation", ExpandEach.of(nullSafe(command.getProductDocumentation())))
+                .forStepId("registerProductDocumentationRequirement", ExpandEach.of(nullSafe(command.getProductDocumentationRequirements())))
+                .forStepId("registerProductLocalization", ExpandEach.of(nullSafe(command.getProductLocalizations())))
+                .forStepId("registerVersion", ExpandEach.of(nullSafe(command.getProductVersions())))
                 .build();
 
         return engine.execute("RegisterProductSaga", inputs);
@@ -65,21 +50,36 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
     @Override
     public Mono<SagaResult> updateProduct(UpdateProductInfoCommand updateProductInfoCommand) {
         StepInputs inputs = StepInputs.builder()
+                .forStepId("readProduct", updateProductInfoCommand)
                 .forStepId("updateProduct", updateProductInfoCommand)
                 .build();
         return engine.execute("UpdateProductSaga", inputs);
     }
 
     @Override
-    public Mono<SagaResult> linkPostingRuleSet(RegisterProductFeeStructureCommand registerProductFeeStructureCommand) {
+    public Mono<SagaResult> changeStatus(UUID productId, String status) {
+        ChangeProductStatusCommand command = new ChangeProductStatusCommand(productId, status);
         StepInputs inputs = StepInputs.builder()
-                .forStepId("registerProductFeeStructure", registerProductFeeStructureCommand)
+                .forStepId("readProductStatus", command)
+                .forStepId("changeProductStatus", command)
                 .build();
-        return engine.execute("RegisterProductFeeStructureSaga", inputs);
+        return engine.execute("ChangeProductStatusSaga", inputs);
+    }
+
+    @Override
+    public Mono<SagaResult> linkPostingRuleSet(RegisterProductConfigurationCommand command) {
+        StepInputs inputs = StepInputs.builder()
+                .forStepId("registerProductConfiguration", command)
+                .build();
+        return engine.execute("RegisterProductConfigurationSaga", inputs);
     }
 
     @Override
     public Mono<ProductDTO> getProductInfo(UUID productId) {
         return queryBus.query(ProductQuery.builder().productId(productId).build());
+    }
+
+    private static <T> List<T> nullSafe(List<T> list) {
+        return list == null ? List.of() : list;
     }
 }

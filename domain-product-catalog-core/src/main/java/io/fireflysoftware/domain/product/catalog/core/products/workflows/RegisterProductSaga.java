@@ -1,24 +1,69 @@
 package io.fireflysoftware.domain.product.catalog.core.products.workflows;
 
+import io.fireflysoftware.core.product.sdk.model.ProductDTO;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductCategoryCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductConfigurationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductDocumentationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductDocumentationRequirementCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductInfoCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductLocalizationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductRelationshipCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductVersionCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductCategoryCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductConfigurationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductDocumentationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductDocumentationRequirementCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductLocalizationCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductRelationshipCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductVersionCommand;
 import org.fireflyframework.cqrs.command.CommandBus;
-import io.fireflysoftware.domain.product.catalog.core.products.commands.*;
+import org.fireflyframework.orchestration.core.context.ExecutionContext;
 import org.fireflyframework.orchestration.saga.annotation.Saga;
 import org.fireflyframework.orchestration.saga.annotation.SagaStep;
 import org.fireflyframework.orchestration.saga.annotation.StepEvent;
-import org.fireflyframework.orchestration.core.context.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-import static io.fireflysoftware.domain.product.catalog.core.utils.constants.GlobalConstants.*;
-import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.*;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.GlobalConstants.CTX_PRODUCT_CATEGORY_ID;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.GlobalConstants.CTX_PRODUCT_ID;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_PRODUCT;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_PRODUCT_CATEGORY;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_PRODUCT_DOCUMENTATION;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_PRODUCT_DOCUMENTATION_REQUIREMENT;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_PRODUCT_LOCALIZATION;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_PRODUCT_RELATIONSHIP;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.COMPENSATE_REMOVE_VERSION;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_PRODUCT_CATEGORY_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_PRODUCT_DOCUMENTATION_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_PRODUCT_DOCUMENTATION_REQUIREMENT_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_PRODUCT_LOCALIZATION_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_PRODUCT_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_PRODUCT_RELATIONSHIP_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.EVENT_VERSION_REGISTERED;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.SAGA_REGISTER_PRODUCT;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_PRODUCT;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_PRODUCT_CATEGORY;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_PRODUCT_DOCUMENTATION;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_PRODUCT_DOCUMENTATION_REQUIREMENT;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_PRODUCT_LOCALIZATION;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_PRODUCT_RELATIONSHIP;
+import static io.fireflysoftware.domain.product.catalog.core.utils.constants.RegisterProductConstants.STEP_REGISTER_VERSION;
 
-
+/**
+ * Registers a product with the aggregates the product core still stores:
+ * category, product, versions, relationships, localizations, documents, and
+ * product configuration. Fees, features, limits, lifecycle rows, and bundles
+ * are not posted. A product without loan pricing configuration still succeeds.
+ */
 @Saga(name = SAGA_REGISTER_PRODUCT)
 @Service
 public class RegisterProductSaga {
+
+    private static final UUID SKIPPED = new UUID(0L, 0L);
 
     private final CommandBus commandBus;
 
@@ -30,222 +75,135 @@ public class RegisterProductSaga {
     @SagaStep(id = STEP_REGISTER_PRODUCT_CATEGORY, compensate = COMPENSATE_REMOVE_PRODUCT_CATEGORY)
     @StepEvent(type = EVENT_PRODUCT_CATEGORY_REGISTERED)
     public Mono<UUID> registerProductCategory(RegisterProductCategoryCommand cmd, ExecutionContext ctx) {
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
         return commandBus.send(cmd)
                 .doOnNext(productCategoryId -> ctx.putVariable(CTX_PRODUCT_CATEGORY_ID, productCategoryId));
     }
 
     public Mono<Void> removeProductCategory(UUID productCategoryId) {
+        if (productCategoryId == null || SKIPPED.equals(productCategoryId)) {
+            return Mono.empty();
+        }
         return commandBus.send(new RemoveProductCategoryCommand(productCategoryId));
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_SUBTYPE, compensate = COMPENSATE_REMOVE_PRODUCT_SUBTYPE, dependsOn = STEP_REGISTER_PRODUCT_CATEGORY)
-    @StepEvent(type = EVENT_PRODUCT_SUBTYPE_REGISTERED)
-    public Mono<UUID> registerProductSubtype(RegisterProductSubtypeCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductCategoryId(ctx.getVariableAs(CTX_PRODUCT_CATEGORY_ID, UUID.class)))
-                .doOnNext(productSubtypeId -> ctx.putVariable(CTX_PRODUCT_SUBTYPE_ID, productSubtypeId));
-    }
-
-    public Mono<Void> removeProductSubtype(UUID productSubtypeId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductSubtypeCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), ctx.getVariableAs(CTX_PRODUCT_CATEGORY_ID, UUID.class), productSubtypeId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_FEE_STRUCTURE, compensate = COMPENSATE_REMOVE_FEE_STRUCTURE)
-    @StepEvent(type = EVENT_FEE_STRUCTURE_REGISTERED)
-    public Mono<UUID> registerFeeStructure(RegisterFeeStructureCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd)
-                .doOnNext(freeStructureId -> ctx.putVariable(CTX_FEE_STRUCTURE_ID, freeStructureId));
-    }
-
-    public Mono<Void> removeFeeStructure(UUID feeStructureId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveFeeStructureCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), feeStructureId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_BUNDLE, compensate = COMPENSATE_REMOVE_PRODUCT_BUNDLE)
-    @StepEvent(type = EVENT_PRODUCT_BUNDLE_REGISTERED)
-    public Mono<UUID> registerProductBundle(RegisterProductBundleCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd)
-                .doOnNext(productBundleId -> ctx.putVariable(CTX_PRODUCT_BUNDLE_ID, productBundleId));
-    }
-
-    public Mono<Void> removeProductBundle(UUID productBundleId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductBundleCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productBundleId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_FEE_COMPONENT, compensate = COMPENSATE_REMOVE_FEE_COMPONENT, dependsOn = STEP_REGISTER_FEE_STRUCTURE)
-    @StepEvent(type = EVENT_FEE_COMPONENT_REGISTERED)
-    public Mono<UUID> registerFeeComponent(RegisterFeeComponentCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withFeeStructureId(ctx.getVariableAs(CTX_FEE_STRUCTURE_ID, UUID.class)))
-                .doOnNext(feeComponentId -> ctx.putVariable(CTX_FEE_COMPONENT_ID, feeComponentId));
-    }
-
-    public Mono<Void> removeFeeComponent(UUID feeComponentId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveFeeComponentCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), feeComponentId, ctx.getVariableAs(CTX_FEE_STRUCTURE_ID, UUID.class)));
-    }
-
-    @SagaStep(id = STEP_REGISTER_FEE_APPLICATION_RULE, compensate = COMPENSATE_REMOVE_FEE_APPLICATION_RULE, dependsOn = {STEP_REGISTER_FEE_COMPONENT, STEP_REGISTER_FEE_STRUCTURE})
-    @StepEvent(type = EVENT_FEE_APPLICATION_RULE_REGISTERED)
-    public Mono<UUID> registerFeeApplicationRule(RegisterFeeApplicationRuleCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd
-                .withFeeComponentId(ctx.getVariableAs(CTX_FEE_COMPONENT_ID, UUID.class)));
-    }
-
-    public Mono<Void> removeFeeApplicationRule(UUID feeApplicationRuleId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveFeeApplicationRuleCommand(
-                ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class),
-                feeApplicationRuleId,
-                ctx.getVariableAs(CTX_FEE_STRUCTURE_ID, UUID.class),
-                ctx.getVariableAs(CTX_FEE_COMPONENT_ID, UUID.class)));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT, compensate = COMPENSATE_REMOVE_PRODUCT, dependsOn = {STEP_REGISTER_PRODUCT_SUBTYPE})
+    @SagaStep(id = STEP_REGISTER_PRODUCT, compensate = COMPENSATE_REMOVE_PRODUCT, dependsOn = STEP_REGISTER_PRODUCT_CATEGORY)
     @StepEvent(type = EVENT_PRODUCT_REGISTERED)
     public Mono<UUID> registerProduct(RegisterProductInfoCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductSubtypeId(ctx.getVariableAs(CTX_PRODUCT_SUBTYPE_ID, UUID.class)))
+        UUID categoryId = ctx.getVariableAs(CTX_PRODUCT_CATEGORY_ID, UUID.class);
+        if (categoryId != null && !SKIPPED.equals(categoryId) && cmd.getProductCategoryId() == null) {
+            cmd.setProductCategoryId(categoryId);
+        }
+        if (cmd.getProductStatus() == null) {
+            cmd.setProductStatus(ProductDTO.ProductStatusEnum.DRAFT);
+        }
+        return commandBus.send(cmd)
                 .doOnNext(productId -> ctx.putVariable(CTX_PRODUCT_ID, productId));
     }
 
     public Mono<Void> removeProduct(UUID productId) {
+        if (productId == null) {
+            return Mono.empty();
+        }
         return commandBus.send(new RemoveProductCommand(productId));
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_FEE_STRUCTURE, compensate = COMPENSATE_REMOVE_PRODUCT_FEE_STRUCTURE, dependsOn = {STEP_REGISTER_PRODUCT, STEP_REGISTER_FEE_STRUCTURE})
-    @StepEvent(type = EVENT_PRODUCT_FEE_STRUCTURE_REGISTERED)
-    public Mono<UUID> registerProductFeeStructure(RegisterProductFeeStructureCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd
-                        .withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class))
-                        .withFeeStructureId(ctx.getVariableAs(CTX_FEE_STRUCTURE_ID, UUID.class)))
-                .doOnNext(productFeeStructureId -> ctx.putVariable(CTX_PRODUCT_FEE_STRUCTURE_ID, productFeeStructureId));
+    @SagaStep(id = "registerProductConfiguration", compensate = "removeProductConfiguration", dependsOn = STEP_REGISTER_PRODUCT)
+    @StepEvent(type = "productConfiguration.registered")
+    public Mono<UUID> registerProductConfiguration(RegisterProductConfigurationCommand cmd, ExecutionContext ctx) {
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
+        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)));
     }
 
-    public Mono<Void> removeProductFeeStructure(UUID productFeeStructureId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductFeeStructureCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productFeeStructureId));
+    public Mono<Void> removeProductConfiguration(UUID configurationId, ExecutionContext ctx) {
+        if (configurationId == null || SKIPPED.equals(configurationId)) {
+            return Mono.empty();
+        }
+        return commandBus.send(new RemoveProductConfigurationCommand(
+                ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), configurationId));
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_BUNDLE_ITEMS, compensate = COMPENSATE_REMOVE_PRODUCT_BUNDLE_ITEMS, dependsOn = {STEP_REGISTER_PRODUCT_BUNDLE, STEP_REGISTER_PRODUCT})
-    @StepEvent(type = EVENT_PRODUCT_BUNDLE_ITEMS_REGISTERED)
-    public Mono<UUID> registerProductBundleItems(RegisterProductBundleItemCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd
-                        .withProductBundleId(ctx.getVariableAs(CTX_PRODUCT_BUNDLE_ID, UUID.class))
-                        .withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productBundleItemId -> ctx.putVariable(CTX_PRODUCT_BUNDLE_ITEM_ID, productBundleItemId));
-    }
-
-    public Mono<Void> removeProductBundleItems(UUID productBundleItemId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductBundleItemCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), ctx.getVariableAs(CTX_PRODUCT_BUNDLE_ID, UUID.class), productBundleItemId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_PRICING, compensate = COMPENSATE_REMOVE_PRODUCT_PRICING, dependsOn = {STEP_REGISTER_PRODUCT})
-    @StepEvent(type = EVENT_PRODUCT_PRICING_REGISTERED)
-    public Mono<UUID> registerProductPricing(RegisterProductPricingCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productPricingId -> ctx.putVariable(CTX_PRODUCT_PRICING_ID, productPricingId));
-    }
-
-    public Mono<Void> removeProductPricing(UUID productPricingId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductPricingCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productPricingId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_RELATIONSHIP, compensate = COMPENSATE_REMOVE_PRODUCT_RELATIONSHIP, dependsOn = {STEP_REGISTER_PRODUCT})
+    @SagaStep(id = STEP_REGISTER_PRODUCT_RELATIONSHIP, compensate = COMPENSATE_REMOVE_PRODUCT_RELATIONSHIP, dependsOn = STEP_REGISTER_PRODUCT)
     @StepEvent(type = EVENT_PRODUCT_RELATIONSHIP_REGISTERED)
     public Mono<UUID> registerProductRelationship(RegisterProductRelationshipCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productRelationshipId -> ctx.putVariable(CTX_PRODUCT_RELATIONSHIP_ID, productRelationshipId));
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
+        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)));
     }
 
     public Mono<Void> removeProductRelationship(UUID productRelationshipId, ExecutionContext ctx) {
+        if (productRelationshipId == null || SKIPPED.equals(productRelationshipId)) {
+            return Mono.empty();
+        }
         return commandBus.send(new RemoveProductRelationshipCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productRelationshipId));
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_DOCUMENTATION, compensate = COMPENSATE_REMOVE_PRODUCT_DOCUMENTATION, dependsOn = {STEP_REGISTER_PRODUCT})
+    @SagaStep(id = STEP_REGISTER_PRODUCT_DOCUMENTATION, compensate = COMPENSATE_REMOVE_PRODUCT_DOCUMENTATION, dependsOn = STEP_REGISTER_PRODUCT)
     @StepEvent(type = EVENT_PRODUCT_DOCUMENTATION_REGISTERED)
     public Mono<UUID> registerProductDocumentation(RegisterProductDocumentationCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productDocumentationId -> ctx.putVariable(CTX_PRODUCT_DOCUMENTATION_ID, productDocumentationId));
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
+        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)));
     }
 
     public Mono<Void> removeProductDocumentation(UUID productDocumentationId, ExecutionContext ctx) {
+        if (productDocumentationId == null || SKIPPED.equals(productDocumentationId)) {
+            return Mono.empty();
+        }
         return commandBus.send(new RemoveProductDocumentationCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productDocumentationId));
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_DOCUMENTATION_REQUIREMENT, compensate = COMPENSATE_REMOVE_PRODUCT_DOCUMENTATION_REQUIREMENT, dependsOn = {STEP_REGISTER_PRODUCT})
+    @SagaStep(id = STEP_REGISTER_PRODUCT_DOCUMENTATION_REQUIREMENT, compensate = COMPENSATE_REMOVE_PRODUCT_DOCUMENTATION_REQUIREMENT, dependsOn = STEP_REGISTER_PRODUCT)
     @StepEvent(type = EVENT_PRODUCT_DOCUMENTATION_REQUIREMENT_REGISTERED)
     public Mono<UUID> registerProductDocumentationRequirement(RegisterProductDocumentationRequirementCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productDocumentationRequirementId -> ctx.putVariable(CTX_PRODUCT_DOCUMENTATION_REQUIREMENT_ID, productDocumentationRequirementId));
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
+        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)));
     }
 
-    public Mono<Void> removeProductDocumentationRequirement(UUID productDocumentationRequirementId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductDocumentationRequirementCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productDocumentationRequirementId));
+    public Mono<Void> removeProductDocumentationRequirement(UUID requirementId, ExecutionContext ctx) {
+        if (requirementId == null || SKIPPED.equals(requirementId)) {
+            return Mono.empty();
+        }
+        return commandBus.send(new RemoveProductDocumentationRequirementCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), requirementId));
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_FEATURES, compensate = COMPENSATE_REMOVE_PRODUCT_FEATURES, dependsOn = {STEP_REGISTER_PRODUCT})
-    @StepEvent(type = EVENT_PRODUCT_FEATURES_REGISTERED)
-    public Mono<UUID> registerProductFeatures(RegisterProductFeatureCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productFeaturesId -> ctx.putVariable(CTX_PRODUCT_FEATURES_ID, productFeaturesId));
-    }
-
-    public Mono<Void> removeProductFeatures(UUID productFeaturesId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductFeatureCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productFeaturesId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_LIFECYCLE, compensate = COMPENSATE_REMOVE_PRODUCT_LIFECYCLE, dependsOn = {STEP_REGISTER_PRODUCT})
-    @StepEvent(type = EVENT_PRODUCT_LIFECYCLE_REGISTERED)
-    public Mono<UUID> registerProductLifecycle(RegisterProductLifecycleCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productLifecycleId -> ctx.putVariable(CTX_PRODUCT_LIFECYCLE_ID, productLifecycleId));
-    }
-
-    public Mono<Void> removeProductLifecycle(UUID productLifecycleId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductLifecycleCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productLifecycleId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_LIMITS, compensate = COMPENSATE_REMOVE_PRODUCT_LIMITS, dependsOn = {STEP_REGISTER_PRODUCT})
-    @StepEvent(type = EVENT_PRODUCT_LIMITS_REGISTERED)
-    public Mono<UUID> registerProductLimits(RegisterProductLimitCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productLimitsId -> ctx.putVariable(CTX_PRODUCT_LIMITS_ID, productLimitsId));
-    }
-
-    public Mono<Void> removeProductLimits(UUID productLimitsId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductLimitCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productLimitsId));
-    }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_LOCALIZATION, compensate = COMPENSATE_REMOVE_PRODUCT_LOCALIZATION, dependsOn = {STEP_REGISTER_PRODUCT})
+    @SagaStep(id = STEP_REGISTER_PRODUCT_LOCALIZATION, compensate = COMPENSATE_REMOVE_PRODUCT_LOCALIZATION, dependsOn = STEP_REGISTER_PRODUCT)
     @StepEvent(type = EVENT_PRODUCT_LOCALIZATION_REGISTERED)
     public Mono<UUID> registerProductLocalization(RegisterProductLocalizationCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productLocalizationId -> ctx.putVariable(CTX_PRODUCT_LOCALIZATION_ID, productLocalizationId));
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
+        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)));
     }
 
-    public Mono<Void> removeProductLocalization(UUID productLocalizationId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductLocalizationCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productLocalizationId));
+    public Mono<Void> removeProductLocalization(UUID localizationId, ExecutionContext ctx) {
+        if (localizationId == null || SKIPPED.equals(localizationId)) {
+            return Mono.empty();
+        }
+        return commandBus.send(new RemoveProductLocalizationCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), localizationId));
     }
 
-    @SagaStep(id = STEP_REGISTER_VERSION, compensate = COMPENSATE_REMOVE_VERSION, dependsOn = {STEP_REGISTER_PRODUCT})
+    @SagaStep(id = STEP_REGISTER_VERSION, compensate = COMPENSATE_REMOVE_VERSION, dependsOn = STEP_REGISTER_PRODUCT)
     @StepEvent(type = EVENT_VERSION_REGISTERED)
     public Mono<UUID> registerVersion(RegisterProductVersionCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)))
-                .doOnNext(productVersionId -> ctx.putVariable(CTX_PRODUCT_VERSION_ID, productVersionId));
+        if (cmd == null) {
+            return Mono.just(SKIPPED);
+        }
+        return commandBus.send(cmd.withProductId(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class)));
     }
 
     public Mono<Void> removeVersion(UUID productVersionId, ExecutionContext ctx) {
+        if (productVersionId == null || SKIPPED.equals(productVersionId)) {
+            return Mono.empty();
+        }
         return commandBus.send(new RemoveProductVersionCommand(ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class), productVersionId));
     }
-
-    @SagaStep(id = STEP_REGISTER_PRODUCT_PRICING_LOCALIZATION, compensate = COMPENSATE_REMOVE_PRODUCT_PRICING_LOCALIZATION, dependsOn = {STEP_REGISTER_PRODUCT, STEP_REGISTER_PRODUCT_PRICING})
-    @StepEvent(type = EVENT_PRODUCT_PRICING_LOCALIZATION_REGISTERED)
-    public Mono<UUID> registerProductPricingLocalization(RegisterProductPricingLocalizationCommand cmd, ExecutionContext ctx) {
-        return commandBus.send(cmd
-                        .withProductPricingId(ctx.getVariableAs(CTX_PRODUCT_PRICING_ID, UUID.class)))
-                .doOnNext(productPricingLocalizationId -> ctx.putVariable(CTX_PRODUCT_PRICING_LOCALIZATION_ID, productPricingLocalizationId));
-    }
-
-    public Mono<Void> removeProductPricingLocalization(UUID productPricingLocalizationId, ExecutionContext ctx) {
-        return commandBus.send(new RemoveProductPricingLocalizationCommand(
-                ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class),
-                ctx.getVariableAs(CTX_PRODUCT_PRICING_ID, UUID.class),
-                productPricingLocalizationId));
-    }
-
 }
