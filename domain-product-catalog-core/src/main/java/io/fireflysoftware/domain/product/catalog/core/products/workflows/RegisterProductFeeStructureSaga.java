@@ -18,7 +18,8 @@
 package io.fireflysoftware.domain.product.catalog.core.products.workflows;
 
 import org.fireflyframework.cqrs.command.CommandBus;
-import io.fireflysoftware.domain.product.catalog.core.products.commands.*;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RegisterProductFeeStructureCommand;
+import io.fireflysoftware.domain.product.catalog.core.products.commands.RemoveProductFeeStructureCommand;
 import org.fireflyframework.orchestration.saga.annotation.Saga;
 import org.fireflyframework.orchestration.saga.annotation.SagaStep;
 import org.fireflyframework.orchestration.saga.annotation.StepEvent;
@@ -44,10 +45,21 @@ public class RegisterProductFeeStructureSaga {
         this.commandBus = commandBus;
     }
 
-    @SagaStep(id = STEP_REGISTER_PRODUCT_FEE_STRUCTURE)
+    @SagaStep(id = STEP_REGISTER_PRODUCT_FEE_STRUCTURE, compensate = "removeProductFeeStructure")
     @StepEvent(type = EVENT_PRODUCT_FEE_STRUCTURE_REGISTERED)
     public Mono<UUID> registerProductFeeStructure(RegisterProductFeeStructureCommand cmd, ExecutionContext ctx) {
+        if (cmd.getProductId() != null) {
+            ctx.putVariable(CTX_PRODUCT_ID, cmd.getProductId());
+        }
         return commandBus.send(cmd);
+    }
+
+    public Mono<Void> removeProductFeeStructure(UUID productFeeStructureId, ExecutionContext ctx) {
+        UUID productId = ctx.getVariableAs(CTX_PRODUCT_ID, UUID.class);
+        if (productFeeStructureId == null || productId == null) {
+            return Mono.empty();
+        }
+        return commandBus.send(new RemoveProductFeeStructureCommand(productId, productFeeStructureId));
     }
 
 }
