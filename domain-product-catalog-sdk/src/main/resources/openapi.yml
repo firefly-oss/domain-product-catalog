@@ -591,6 +591,7 @@ components:
           - ACTIVE
           - RETIRED
           - DRAFT
+          - SUSPENDED
         launchDate:
           type: string
           format: date
@@ -845,6 +846,7 @@ components:
           - ACTIVE
           - RETIRED
           - DRAFT
+          - SUSPENDED
         launchDate:
           type: string
           format: date

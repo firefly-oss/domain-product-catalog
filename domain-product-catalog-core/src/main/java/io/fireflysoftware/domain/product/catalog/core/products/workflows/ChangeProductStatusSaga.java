@@ -20,8 +20,8 @@ import java.util.UUID;
 
 /**
  * Status moves among the values the product core stores. Delete is limited to
- * draft and proposed. The published 26.10.3 SDK omits SUSPENDED even though the
- * core enum and database include it; that move is rejected until the SDK train.
+ * draft and proposed. Active can be suspended or retired. Suspended can return
+ * to active or be retired.
  */
 @Saga(name = "ChangeProductStatusSaga")
 @Service
@@ -32,7 +32,10 @@ public class ChangeProductStatusSaga {
                     ProductDTO.ProductStatusEnum.PROPOSED, ProductDTO.ProductStatusEnum.ACTIVE),
             ProductDTO.ProductStatusEnum.PROPOSED, EnumSet.of(
                     ProductDTO.ProductStatusEnum.DRAFT, ProductDTO.ProductStatusEnum.ACTIVE),
-            ProductDTO.ProductStatusEnum.ACTIVE, EnumSet.of(ProductDTO.ProductStatusEnum.RETIRED),
+            ProductDTO.ProductStatusEnum.ACTIVE, EnumSet.of(
+                    ProductDTO.ProductStatusEnum.SUSPENDED, ProductDTO.ProductStatusEnum.RETIRED),
+            ProductDTO.ProductStatusEnum.SUSPENDED, EnumSet.of(
+                    ProductDTO.ProductStatusEnum.ACTIVE, ProductDTO.ProductStatusEnum.RETIRED),
             ProductDTO.ProductStatusEnum.RETIRED, EnumSet.noneOf(ProductDTO.ProductStatusEnum.class)
     );
 
@@ -85,11 +88,6 @@ public class ChangeProductStatusSaga {
     }
 
     private static ProductDTO.ProductStatusEnum parse(String status) {
-        try {
-            return ProductDTO.ProductStatusEnum.fromValue(status);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException(
-                    "Status " + status + " is stored by the product core but is missing from SDK 26.10.3");
-        }
+        return ProductDTO.ProductStatusEnum.fromValue(status);
     }
 }
